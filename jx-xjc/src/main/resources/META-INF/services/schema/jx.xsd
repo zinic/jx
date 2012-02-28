@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified"
+           targetNamespace="http://docs.openstack.org/common/api/v1.0"
+           xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+           xmlns:jx="http://jpserver.net/jx"
+           xmlns:limits="http://docs.openstack.org/common/api/v1.0"
+           xmlns:html="http://www.w3.org/1999/xhtml"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           jaxb:extensionBindingPrefixes="jx">
+
+    <!-- Enumeration and SimpleType definitions -->
+   <xs:simpleType name="HttpMethod">
+      <xs:annotation>
+         <xs:documentation>
+            <html:p>
+               The HttpMethod simple type defines a string
+               enumeration of HTTP method verbs as outlined in 
+               <a
+                  href="http://www.ietf.org/rfc/rfc2616.txt">RFC2616
+               </a>
+               section 9.
+            </html:p>
+         </xs:documentation>
+      </xs:annotation>
+        
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="GET" />
+         <xs:enumeration value="DELETE" />
+         <xs:enumeration value="POST" />
+         <xs:enumeration value="PUT" />
+         <xs:enumeration value="HEAD" />
+         <xs:enumeration value="OPTIONS" />
+         <xs:enumeration value="CONNECT" />
+         <xs:enumeration value="TRACE" />
+            
+         <xs:enumeration value="ALL" />
+      </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="TimeUnit">
+      <xs:annotation>
+         <xs:documentation>
+            <html:p>
+               The TimeUnit simple type defines a string
+               enumeration of coarse time units that are be used
+               to define the duration of time that a limited
+               request will be unavailable for.
+            </html:p>
+         </xs:documentation>
+      </xs:annotation>
+        
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="SECOND" />
+         <xs:enumeration value="MINUTE" />
+         <xs:enumeration value="HOUR" />
+         <xs:enumeration value="DAY" />
+      </xs:restriction>
+   </xs:simpleType>
+    
+    
+    <!-- Live limit definitions -->
+   <xs:element name="limits" type="limits:Limits">
+      <xs:annotation>
+         <xs:appinfo>
+            <jx:wrap />
+         </xs:appinfo>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:complexType name="Limits">
+      <xs:annotation>
+         <xs:documentation>
+            <html:p>
+               A Limits type defines a collection of limits
+            </html:p>
+         </xs:documentation>
+      </xs:annotation>
+        
+      <xs:sequence>
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="AbsoluteLimitList">
+      <xs:annotation>
+         <xs:documentation>
+            <html:p>
+               An AbsoluteLimitList type defines a list of absolute limits
+            </html:p>
+         </xs:documentation>
+      </xs:annotation>
+
+      <xs:sequence>
+      </xs:sequence>
+   </xs:complexType>
+</xs:schema>

@@ -1,0 +1,110 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+            
+   <modelVersion>4.0.0</modelVersion>
+   
+   <groupId>net.jps</groupId>
+   <artifactId>jx</artifactId>
+   <version>0.1.0-SNAPSHOT</version>
+   
+   <packaging>pom</packaging>
+
+   <modules>
+      <module>jx-xjc</module>
+      <module>jx-test</module>
+   </modules>
+   
+   <name>JX - JSON XML Binding Model</name>
+   
+   <description>
+      XSD annotation framework for generating more correct JSON from the XSD bindings.
+   </description>
+
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <project.license>apache20</project.license>
+   </properties>
+
+   <licenses>
+      <license>
+         <name>Apache License, Version 2.0</name>
+         <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      </license>
+   </licenses>
+
+   <scm>
+      <connection>scm:git:ssh://git@github.com/zinic/jx.git</connection>
+   </scm>
+    
+   <repositories>
+      <repository>
+         <id>public.maven.research.rackspace.com</id>
+            
+         <name>Rackspace Research</name>
+         <url>http://maven.research.rackspacecloud.com/content/groups/aggregate</url>
+      </repository>
+   </repositories>
+
+   <distributionManagement>
+      <repository>
+         <id>releases.maven.research.rackspace.com</id>
+ 
+         <name>Rackspace Research Releases</name>
+         <url>http://maven.research.rackspacecloud.com/content/repositories/releases</url>
+      </repository>
+        
+      <snapshotRepository>
+         <id>snapshots.maven.research.rackspace.com</id>
+
+         <name>Rackspace Research Snapshots</name>
+         <url>http://maven.research.rackspacecloud.com/content/repositories/snapshots</url>
+      </snapshotRepository>
+   </distributionManagement>
+   
+   <dependencyManagement>
+      <dependencies>
+         <dependency>
+            <groupId>net.jps</groupId>
+            <artifactId>jx-xjc</artifactId>
+            <version>${project.version}</version>
+         </dependency>
+
+         <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.2.5</version>
+         </dependency>
+      
+         <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-xjc</artifactId>
+            <version>2.2.5</version>
+         </dependency>
+      
+         <dependency>
+            <groupId>org.jvnet.jaxb2_commons</groupId>
+            <artifactId>jaxb2-basics-runtime</artifactId>
+            <version>0.6.3</version>
+         </dependency>
+      </dependencies>
+   </dependencyManagement>
+   
+   <build>
+      <pluginManagement>
+         <plugins>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-compiler-plugin</artifactId>
+               <version>2.3.2</version>
+
+               <configuration>
+                  <source>1.6</source>
+                  <target>1.6</target>
+               </configuration>
+            </plugin>
+         </plugins>
+      </pluginManagement>
+   </build>
+</project>
