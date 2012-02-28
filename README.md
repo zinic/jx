@@ -20,6 +20,7 @@ intent.
 This is a project dedicated to help test the generation rules outlined in the
 XJC plugin.
 
-##The Features## (I'm working on them...)
+##The Features##
+(as I work on them)
 
 * Allows users to annotate XSD entities with _<jx:wrap />_
