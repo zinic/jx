@@ -23,4 +23,4 @@ XJC plugin.
 ##The Features##
 (as I work on them)
 
-* Allows users to annotate XSD entities with _<jx:wrap />_
+* Allows users to annotate XSD entities with ```xml <jx:wrap />```
