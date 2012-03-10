@@ -7,7 +7,8 @@ package net.jps.jx;
 public enum JxLocalName {
    
    OBJECT_WRAP("wrap"),
-   ELEMENT_VALUE_NAME("value-name");
+   ATTRIBUTE_MAP("map"),
+   ELEMENT_VALUE_MAP("map-value");
    
    public static boolean isLocalName(String localName) {
       return getMatchingLocalName(localName) != null;

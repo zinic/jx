@@ -31,5 +31,20 @@
          <groupId>com.sun.xml.bind</groupId>
          <artifactId>jaxb-xjc</artifactId>
       </dependency>
+      
+      <dependency>
+         <groupId>org.codehaus.jackson</groupId>
+         <artifactId>jackson-core-asl</artifactId>
+      </dependency>
+      
+      <dependency>
+         <groupId>org.mockito</groupId>
+         <artifactId>mockito-all</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+      </dependency>
    </dependencies>
 </project>

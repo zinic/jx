@@ -128,7 +128,14 @@
       </xs:annotation>
         
       <xs:sequence>
-         <xs:element name="limit" type="limits:RateLimit" minOccurs="1" maxOccurs="unbounded" />
+         <xs:element name="limit" type="limits:RateLimit" minOccurs="1" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:appinfo>
+                  <jx:map as="limits" />
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:element>
+         
          <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
       </xs:sequence>
     
@@ -245,6 +252,10 @@
                   of requests that the rate limit will allow.
                </html:p>
             </xs:documentation>
+            
+            <xs:appinfo>
+               <jx:map as="limit" />
+            </xs:appinfo>
          </xs:annotation>
       </xs:attribute>
 
@@ -268,6 +279,10 @@
                   limited request's unavailability.
                </html:p>
             </xs:documentation>
+            
+            <xs:appinfo>
+               <jx:map as="timeUnit" />
+            </xs:appinfo>
          </xs:annotation>
       </xs:attribute>
 

@@ -9,5 +9,5 @@ import java.lang.annotation.*;
 @Inherited
 @Retention(value = RetentionPolicy.RUNTIME)
 @Target(value = {ElementType.TYPE})
-public @interface JxWrapObject {
+public @interface JsonObjectWrap {
 }

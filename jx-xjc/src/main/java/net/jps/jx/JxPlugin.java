@@ -1,16 +1,18 @@
 package net.jps.jx;
 
+import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JFieldVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
-import com.sun.tools.xjc.model.CClassInfo;
-import com.sun.tools.xjc.model.CCustomizations;
-import com.sun.tools.xjc.model.CPluginCustomization;
+import com.sun.tools.xjc.model.*;
 import com.sun.tools.xjc.outline.ClassOutline;
+import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
 import java.util.Collections;
 import java.util.List;
-import net.jps.jx.annotation.JxWrapObject;
+import net.jps.jx.annotation.JsonField;
+import net.jps.jx.annotation.JsonObjectWrap;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 
@@ -38,7 +40,7 @@ public class JxPlugin extends Plugin {
    @Override
    public boolean isCustomizationTagName(String nsUri, String localName) {
       System.out.println("isCustomizationTagName for \"" + nsUri + ":" + localName + "\" - " + (jxNamespace.equals(nsUri) && JxLocalName.isLocalName(localName)));
-      
+
       return jxNamespace.equals(nsUri) && JxLocalName.isLocalName(localName);
    }
 
@@ -57,23 +59,68 @@ public class JxPlugin extends Plugin {
       for (ClassOutline classOutline : otln.getClasses()) {
          final CClassInfo target = classOutline.target;
          final CCustomizations classCustomizations = target.getCustomizations();
-         
-         // Check for wrap customization
-         final CPluginCustomization wrapCustomization = classCustomizations.find(jxNamespace, JxLocalName.OBJECT_WRAP.toString());
-         
-         if (wrapCustomization != null) {
-            System.out.println("Found wrap annotation. This class should be annotated.");
+
+         // Check for class level customizations first
+         readClassAnnotations(classOutline, classCustomizations);
+
+         for (FieldOutline fieldOutline : classOutline.getDeclaredFields()) {
+            System.out.println("Field: " + fieldOutline.getPropertyInfo().displayName());
             
-            handleWrappedType(classOutline);
-            wrapCustomization.markAsAcknowledged();
+            readFieldAnnotations(classOutline, fieldOutline);
          }
       }
-
+      
       return true;
    }
-   
+
+   public void readClassAnnotations(ClassOutline classOutline, CCustomizations classCustomizations) {
+      readWrappedAnnotation(classOutline, classCustomizations);
+   }
+
+   public void readFieldAnnotations(ClassOutline classOutline, FieldOutline fieldOutline) {
+      readMapAnnotation(classOutline, fieldOutline);
+   }
+
+   public void readMapAnnotation(ClassOutline classOutline, FieldOutline fieldOutline) {
+      final CPluginCustomization mapAnnotation = fieldOutline.getPropertyInfo().getCustomizations().find(jxNamespace, JxLocalName.ATTRIBUTE_MAP.toString());
+
+      if (mapAnnotation != null && fieldOutline.getPropertyInfo() instanceof CPropertyInfo) {
+         final CPropertyInfo attributePropertyInfo = (CPropertyInfo) fieldOutline.getPropertyInfo();
+         
+         System.out.println("Found attribute map annotation. Class field \"" + attributePropertyInfo.getName(false) + "\" should be annotated as \"" + mapAnnotation.element.getAttribute("as") + "\"");
+         
+         final JDefinedClass jclass = classOutline.implClass;
+         final JFieldVar o = jclass.fields().get(fieldOutline.getPropertyInfo().getName(false));
+         o.annotate(jclass.owner().ref(JsonField.class)).param("value", mapAnnotation.element.getAttribute("as"));
+         
+         mapAnnotation.markAsAcknowledged();
+      }
+   }
+
+   public void readValueMapAnnotation(ClassOutline classOutline, CCustomizations classCustomizations) {
+      final CPluginCustomization wrapCustomization = classCustomizations.find(jxNamespace, JxLocalName.ELEMENT_VALUE_MAP.toString());
+
+      if (wrapCustomization != null) {
+         System.out.println("Found wrap annotation. This class should be annotated.");
+
+         handleWrappedType(classOutline);
+         wrapCustomization.markAsAcknowledged();
+      }
+   }
+
+   public void readWrappedAnnotation(ClassOutline classOutline, CCustomizations classCustomizations) {
+      final CPluginCustomization wrapCustomization = classCustomizations.find(jxNamespace, JxLocalName.OBJECT_WRAP.toString());
+
+      if (wrapCustomization != null) {
+         System.out.println("Found wrap annotation. This class should be annotated.");
+
+         handleWrappedType(classOutline);
+         wrapCustomization.markAsAcknowledged();
+      }
+   }
+
    public void handleWrappedType(ClassOutline classOutline) {
       final JDefinedClass jclass = classOutline.implClass;
-      jclass.annotate(jclass.owner().ref(JxWrapObject.class));
+      jclass.annotate(jclass.owner().ref(JsonObjectWrap.class));
    }
 }
