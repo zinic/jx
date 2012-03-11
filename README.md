@@ -23,4 +23,5 @@ XJC plugin.
 ##The Features##
 (as I work on them)
 
-* Allows users to annotate XSD entities with ```<jx:wrap />```
+* ```<jx:wrap />```: Binds a wrap annotation to the XSD type, letting the JxJSON reader know that the JSON representation of the type will have an object wrapper ```{ ...wrapped contents... }```
+* ```<jx:map as="[json-field-name]" />```: Binds a JSON field name annotation to the XSD type or Element, allowing a user the ability to arbitrarily bind XSD names to JSON fields.
