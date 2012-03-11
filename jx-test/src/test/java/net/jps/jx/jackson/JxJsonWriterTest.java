@@ -18,13 +18,13 @@ import org.junit.runner.RunWith;
  * @author zinic
  */
 @RunWith(Enclosed.class)
-public class JaxbObjectJsonWriterTest {
+public class JxJsonWriterTest {
 
    public static class WhenSerializingJxJaxbObjects {
 
       @Test
       public void should() throws Exception {
-         final InputStream inputStream = JaxbObjectJsonWriterTest.class.getResourceAsStream("/META-INF/xml/limits.xml");
+         final InputStream inputStream = JxJsonWriterTest.class.getResourceAsStream("/META-INF/xml/limits.xml");
 
          final JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
          final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
@@ -34,7 +34,7 @@ public class JaxbObjectJsonWriterTest {
          final ByteArrayOutputStream baos = new ByteArrayOutputStream();
          final JsonGenerator jsonGenerator = new JsonFactory().createJsonGenerator(baos);
 
-         final JaxbObjectJsonWriter jsonWriter = new JaxbObjectJsonWriter(jsonGenerator, limits);
+         final JxJsonWriter jsonWriter = new JxJsonWriter(jsonGenerator, limits);
          
          try {
             jsonWriter.write();

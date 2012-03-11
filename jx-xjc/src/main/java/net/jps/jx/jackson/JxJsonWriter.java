@@ -6,13 +6,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import javax.xml.bind.annotation.XmlAnyAttribute;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.datatype.XMLGregorianCalendar;
-import net.jps.jx.annotation.JsonField;
 import net.jps.jx.annotation.JsonObjectWrap;
+import net.jps.jx.util.reflection.JxAnnotationTool;
+import net.jps.jx.util.reflection.GetterMethodNotFoundException;
+import net.jps.jx.jackson.mapping.MappedField;
+import net.jps.jx.util.reflection.ReflectionException;
+import net.jps.jx.util.reflection.ReflectiveMappedField;
+import net.jps.jx.jaxb.JaxbConstants;
 import org.codehaus.jackson.JsonGenerator;
 
 /**
@@ -28,34 +29,33 @@ import org.codehaus.jackson.JsonGenerator;
  *
  * @author zinic
  */
-public class JaxbObjectJsonWriter {
+public class JxJsonWriter {
 
-   private static final String JAXB_DEFAULT_NAME = "##default";
    private final JsonGenerator jsonGenerator;
    private final Object objectBeingWritten;
    private final Class objectClass;
 
-   public JaxbObjectJsonWriter(JsonGenerator jsonGenerator, Object objectBeingWritten) {
+   public JxJsonWriter(JsonGenerator jsonGenerator, Object objectBeingWritten) {
       this(jsonGenerator, objectBeingWritten, objectBeingWritten.getClass());
    }
 
-   private JaxbObjectJsonWriter(JsonGenerator jsonGenerator, Object objectBeingWritten, Class objectClass) {
+   private JxJsonWriter(JsonGenerator jsonGenerator, Object objectBeingWritten, Class objectClass) {
       this.jsonGenerator = jsonGenerator;
       this.objectBeingWritten = objectBeingWritten;
       this.objectClass = objectClass;
    }
 
    public void write() throws IOException {
-      final boolean shouldWrap = shouldWrap();
+      final boolean shouldWrap = JxAnnotationTool.shouldWrapClass(objectClass);
 
       // Entity start
       if (shouldWrap) {
          jsonGenerator.writeStartObject();
       }
 
-      for (Field f : objectClass.getDeclaredFields()) {
-         if (isInterestedInField(f)) {
-            writeField(f);
+      for (Field field : objectClass.getDeclaredFields()) {
+         if (JxAnnotationTool.isInterestedInField(field)) {
+            writeField(field);
          }
       }
 
@@ -65,62 +65,27 @@ public class JaxbObjectJsonWriter {
       }
    }
 
-   /**
-    * Ignore anyElement and anyAttribute marked fields
-    *
-    * @param f
-    * @return
-    */
-   public boolean isInterestedInField(Field f) {
-      return f.getAnnotation(XmlAnyElement.class) == null && f.getAnnotation(XmlAnyAttribute.class) == null;
-   }
-
-   public boolean shouldWrap() {
-      return objectClass.getAnnotation(JsonObjectWrap.class) != null;
-   }
-
-   public String getJsonNameForField(Field f) {
-      final JsonField jsonFieldAnnotation = (JsonField) f.getAnnotation(JsonField.class);
-
-      return jsonFieldAnnotation != null ? jsonFieldAnnotation.value() : getJaxbNameForField(f);
-   }
-
-   public String getJaxbNameForField(Field f) {
-      final XmlAttribute xmlAttributeAnnotation = (XmlAttribute) f.getAnnotation(XmlAttribute.class);
-      final XmlElement xmlElementAnnotation = (XmlElement) f.getAnnotation(XmlElement.class);
-
-      if (xmlAttributeAnnotation != null) {
-         return JAXB_DEFAULT_NAME.equals(xmlAttributeAnnotation.name()) ? f.getName() : xmlAttributeAnnotation.name();
-      }
-
-      if (xmlElementAnnotation != null) {
-         return JAXB_DEFAULT_NAME.equals(xmlElementAnnotation.name()) ? f.getName() : xmlElementAnnotation.name();
-      }
-
-      return f.getName();
-   }
-
-   public void writeField(Field f) throws IOException {
-      final String getterMethodName = formatGetterMethodName(f.getName(), objectClass);
+   public void writeField(Field field) throws IOException {
+      final MappedField mappedField = new ReflectiveMappedField(field, objectBeingWritten);
 
       try {
-         writeField(f, callGetter(getterMethodName, objectBeingWritten, objectClass));
+         writeMappedField(mappedField);
       } catch (GetterMethodNotFoundException gmnfe) {
          throw new ReflectionException(gmnfe.getMessage(), gmnfe);
       }
    }
 
-   public void writeField(Field f, Object fieldValue) throws IOException, GetterMethodNotFoundException {
+   public void writeMappedField(MappedField mappedField) throws IOException, GetterMethodNotFoundException {
+      final Object fieldValue = mappedField.get();
+      
       if (fieldValue != null) {
-         System.out.println(getJsonNameForField(f));
-         
-         jsonGenerator.writeFieldName(getJsonNameForField(f));
+         jsonGenerator.writeFieldName(mappedField.getName());
 
-         final Class fieldClass = fieldValue.getClass();
+         final Class fieldValueClass = fieldValue.getClass();
 
-         if (Enum.class.isAssignableFrom(fieldClass)) {
-            writeObject(callGetter("value", fieldValue, fieldClass));
-         } else if (Iterable.class.isAssignableFrom(fieldClass)) {
+         if (Enum.class.isAssignableFrom(fieldValueClass)) {
+            writeObject(callGetter("value", fieldValue, fieldValueClass));
+         } else if (Iterable.class.isAssignableFrom(fieldValueClass)) {
             jsonGenerator.writeStartArray();
 
             for (Object o : (Iterable) fieldValue) {
@@ -162,7 +127,7 @@ public class JaxbObjectJsonWriter {
       } else {
          jsonGenerator.writeStartObject();
          
-         new JaxbObjectJsonWriter(jsonGenerator, fieldValue).write();
+         new JxJsonWriter(jsonGenerator, fieldValue).write();
          
          jsonGenerator.writeEndObject();
       }
@@ -176,12 +141,6 @@ public class JaxbObjectJsonWriter {
       }
 
       return false;
-   }
-
-   public Object callGetterForField(String name, Class fieldType) throws GetterMethodNotFoundException {
-      final String getterMethodName = formatGetterMethodName(name, fieldType);
-
-      return callGetter(getterMethodName, objectBeingWritten, fieldType);
    }
 
    public Object callGetter(String getterMethodName, Object o, Class type) throws GetterMethodNotFoundException {
@@ -200,25 +159,5 @@ public class JaxbObjectJsonWriter {
       }
 
       throw new GetterMethodNotFoundException("Unable to find getter method for field \"" + type.getCanonicalName() + "\". Looking for: " + getterMethodName);
-   }
-
-   public String formatGetterMethodName(String name, Class fieldType) {
-      final StringBuilder methodNameBuilder = new StringBuilder(name);
-
-      // JAXB espcaes field names that clash with reserved keywords with a '_' character
-      if (methodNameBuilder.charAt(0) == '_') {
-         methodNameBuilder.deleteCharAt(0);
-      }
-
-      final char fieldNameFirstChar = methodNameBuilder.charAt(0);
-
-      if (Character.isLowerCase(fieldNameFirstChar)) {
-         methodNameBuilder.setCharAt(0, Character.toUpperCase(fieldNameFirstChar));
-      }
-
-      final String getterPrefix = fieldType.equals(boolean.class) || fieldType.equals(Boolean.class) ? "is" : "get";
-      methodNameBuilder.insert(0, getterPrefix);
-
-      return methodNameBuilder.toString();
    }
 }
