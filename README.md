@@ -1,4 +1,4 @@
-#JX the JAXB JSON-XML Binding Model#
+#Jx the JAXB JSON-XML Binding Model#
 
 ##The Project Structure##
 
