@@ -16,11 +16,11 @@ import net.jps.jx.jaxb.JaxbConstants;
  */
 public class ReflectiveMappedField implements MappedField {
 
+   private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
    private final XmlAttribute xmlAttributeAnnotation;
    private final XmlElement xmlElementAnnotation;
    private final JsonField jsonFieldAnnotation;
    private final Class instanceClass;
-   
    private final Object instanceRef;
    private final Field fieldRef;
    private final Method getterRef, setterRef;
@@ -28,7 +28,7 @@ public class ReflectiveMappedField implements MappedField {
    public ReflectiveMappedField(Field fieldRef, Object instanceRef) {
       this.fieldRef = fieldRef;
       this.instanceRef = instanceRef;
-      
+
       instanceClass = instanceRef.getClass();
 
       xmlElementAnnotation = (XmlElement) fieldRef.getAnnotation(XmlElement.class);
@@ -39,19 +39,31 @@ public class ReflectiveMappedField implements MappedField {
       setterRef = findSetter();
    }
 
+   public Field getFieldRef() {
+      return fieldRef;
+   }
+
+   public Class getInstanceClass() {
+      return instanceClass;
+   }
+
+   public Object getInstanceRef() {
+      return instanceRef;
+   }
+
    @Override
    public String getName() {
       return jsonFieldAnnotation != null ? jsonFieldAnnotation.value() : getJaxbNameForField();
    }
-   
+
    @Override
    public boolean canSet() {
       return setterRef != null;
    }
-   
+
    @Override
    public boolean isCollection() {
-      return Collection.class.isAssignableFrom(instanceClass);
+      return Collection.class.isAssignableFrom(fieldRef.getType());
    }
 
    private String getJaxbNameForField() {
@@ -75,7 +87,7 @@ public class ReflectiveMappedField implements MappedField {
          }
       }
 
-      throw new ReflectionException("Unable to find getter method: " + getterMethodName + "() for field: " + fieldRef.getName());
+      throw new ReflectionException("Unable to find getter method: " + getterMethodName + "() for field: " + fieldRef.getName() + " with class: " + instanceClass.getName());
    }
 
    private Method findSetter() {
@@ -125,15 +137,7 @@ public class ReflectiveMappedField implements MappedField {
 
    @Override
    public Object get() {
-      try {
-         return getterRef.invoke(instanceRef);
-      } catch (IllegalAccessException iae) {
-         throw new ReflectionException("Unable to access method for invocation. Target method: " + getterRef.getName(), iae);
-      } catch (IllegalArgumentException iae) {
-         throw new ReflectionException("Illegal argument caught by underlying method during reflective call. Target method: " + getterRef.getName(), iae);
-      } catch (InvocationTargetException ite) {
-         throw new ReflectionException("Method invocation failed. Target method: " + getterRef.getName(), ite);
-      }
+      return invoke(getterRef);
    }
 
    @Override
@@ -144,8 +148,16 @@ public class ReflectiveMappedField implements MappedField {
          throw new IllegalArgumentException("Value class being set: " + valueClass.getName() + " is not assignable to class: " + fieldRef.getType().getName());
       }
 
+      invoke(getterRef, value);
+   }
+
+   public Object invoke(Method m) {
+      return invoke(m, EMPTY_OBJECT_ARRAY);
+   }
+
+   public Object invoke(Method m, Object... args) {
       try {
-         setterRef.invoke(instanceRef, value);
+         return m.invoke(instanceRef, args);
       } catch (IllegalAccessException iae) {
          throw new ReflectionException("Unable to access method for invocation. Target method: " + setterRef.getName(), iae);
       } catch (IllegalArgumentException iae) {

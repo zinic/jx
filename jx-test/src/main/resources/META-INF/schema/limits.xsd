@@ -62,6 +62,7 @@
     <!-- Live limit definitions -->
    <xs:element name="limits" type="limits:Limits" />
 
+
    <xs:complexType name="Limits">
       <xs:annotation>
          <xs:documentation>
