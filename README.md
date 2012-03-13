@@ -35,9 +35,10 @@ XJC plugin.
 
 ###The XML###
 
-[An annotated schema](https://github.com/zinic/jx/blob/master/jx-test/src/main/resources/META-INF/schema/limits.xsd) (because I'm lazy)
+[A Jx annotated example schema](https://github.com/zinic/jx/blob/master/jx-test/src/main/resources/META-INF/schema/limits.xsd)
 
 ###The Javas###
 
 [An example of how to write out JSON content from a JAXB object graph](https://github.com/zinic/jx/blob/master/jx-test/src/test/java/net/jps/jx/jackson/JxJsonWriterTest.java)
+
 [An example of how to bind JSON content to a JAXB object graph](https://github.com/zinic/jx/blob/master/jx-test/src/test/java/net/jps/jx/jackson/JxJsonReaderTest.java)
