@@ -14,6 +14,14 @@ Jx makes it trivial to support XML and JSON with ONE schema contract (the XSD sc
 
 ##The Features##
 
+###Code Features###
+
+* Streaming JAXB to JSON generator
+
+* Streaming JSON to JAXB mapper
+
+###Jx XSD Annotations###
+
 * ```<jx:wrap />```
 
     Binds a wrap annotation to the XSD type, letting the JxJSON reader know that the JSON representation of the type will have an object wrapper ```{ ...wrapped contents... }``` placed around it.
