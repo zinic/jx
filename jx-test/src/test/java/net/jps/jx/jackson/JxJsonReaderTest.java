@@ -52,7 +52,7 @@ public class JxJsonReaderTest {
          final JxJsonReader<Limits> limitsReader = new JxJsonReader<Limits>(jsonParser, Limits.class);
          final ObjectGraphBuilder<Limits> builder = limitsReader.render();
          
-         System.out.println("done");
+         System.out.println("Done. Built object: " + builder.getObjectInstance());
       }
 
       public Limits unwrap(Object o) {
