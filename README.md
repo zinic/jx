@@ -1,5 +1,27 @@
 #Jx the JAXB JSON-XML Binding Model#
 
+###What is it?###
+
+Jx is an annotation framework that's inspired by [JXON](http://www.balisage.net/Proceedings/vol7/html/Lee01/BalisageVol7-Lee01.html).
+
+Jx cuts out a lot of JXON's concerns by relying on the well established transformations and bindings that exist in [JAXB](http://www.oracle.com/technetwork/articles/javase/index-140168.html).
+
+###Cool... so what's it do?###
+
+Jx allows you to annotate an XSD schema using JAXB schema customizations. These annotations are used to help direct the processing and generation of JSON structural renderings derived from the XSD schema in a predictable, type-safe manner.
+
+Jx makes it trivial to support XML and JSON with ONE schema contract (the XSD schema). Jx will automatically map both XML and JSON representations of the schema to the underlying Java JAXB classes.
+
+##The Features##
+
+* ```<jx:wrap />```
+
+    Binds a wrap annotation to the XSD type, letting the JxJSON reader know that the JSON representation of the type will have an object wrapper ```{ ...wrapped contents... }``` placed around it.
+
+* ```<jx:map as="[json-field-name]" />```
+
+    Binds a JSON field name annotation to the XSD type or Element, allowing a user the ability to arbitrarily bind XSD names to JSON fields.
+
 ##The Project Structure##
 
 This project has three maven POM files specified in it.
@@ -19,17 +41,6 @@ intent.
 
 This is a project dedicated to help test the generation rules outlined in the
 XJC plugin.
-
-##The Features##
-
-* ```<jx:wrap />```
-
-    Binds a wrap annotation to the XSD type, letting the JxJSON reader know that the JSON representation of the type will have an object wrapper ```{ ...wrapped contents... }``` placed around it.
-
-* ```<jx:map as="[json-field-name]" />```
-
-    Binds a JSON field name annotation to the XSD type or Element, allowing a user the ability to arbitrarily bind XSD names to JSON fields.
-
 
 ##The Examples##
 
