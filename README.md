@@ -1,4 +1,4 @@
-#Jx the JAXB JSON-XML Binding Model#
+#Jx the JAXB JSON-XML Binding Model and XJC Plugin#
 
 ###What is it?###
 
