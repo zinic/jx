@@ -12,6 +12,7 @@ Jx allows you to annotate an XSD schema using JAXB schema customizations. These 
 
 Jx makes it trivial to support XML and JSON with ONE schema contract (the XSD schema). Jx will automatically map both XML and JSON representations of the schema to the underlying Java JAXB classes.
 
+
 ##The Features##
 
 ###Code Features###
@@ -29,6 +30,7 @@ Jx makes it trivial to support XML and JSON with ONE schema contract (the XSD sc
 * ```<jx:map as="[json-field-name]" />```
 
     Binds a JSON field name annotation to the XSD type or Element, allowing a user the ability to arbitrarily bind XSD names to JSON fields.
+
 
 ##The Project Structure##
 
@@ -49,6 +51,7 @@ intent.
 
 This is a project dedicated to help test the generation rules outlined in the
 XJC plugin.
+
 
 ##The Examples##
 
