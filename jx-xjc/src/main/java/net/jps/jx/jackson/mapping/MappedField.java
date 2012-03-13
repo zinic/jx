@@ -10,9 +10,13 @@ public interface MappedField {
 
    Object get();
 
+   boolean hasGetter();
+
    void set(Object value);
 
-   boolean isCollection();
+   boolean hasSetter();
+
+   boolean shouldDescend();
 
    boolean canSet();
 }

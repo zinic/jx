@@ -12,14 +12,14 @@ import com.sun.tools.xjc.outline.Outline;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import net.jps.jx.annotation.CollectionType;
 import net.jps.jx.annotation.JsonField;
 import net.jps.jx.annotation.JsonObjectWrap;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Deal with this - http://docs.openstack.org/api/openstack-compute/2/content/List_Metadata-d1e5089.html
+ * 
  * @author zinic
  */
 public class JxPlugin extends Plugin {

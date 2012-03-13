@@ -1,7 +1,6 @@
 package net.jps.jx.jackson.mapping;
 
 import net.jps.jx.util.reflection.JxAnnotationTool;
-import net.jps.jx.util.reflection.MappedCollection;
 
 /**
  *
@@ -21,15 +20,15 @@ public class ObjectGraphNode {
    }
 
    public boolean isCollection() {
-      return mappedField != null && mappedField.isCollection();
+      return mappedField != null && MappedCollection.class.isAssignableFrom(mappedField.getClass());
+   }
+
+   public boolean isEnumeration() {
+      return mappedField != null && MappedEnumeration.class.isAssignableFrom(mappedField.getClass());
    }
 
    public MappedField getMappedField() {
       return mappedField;
-   }
-
-   public MappedCollection getMappedCollection() {
-      return (MappedCollection) mappedField;
    }
 
    public ObjectGraphBuilder getObjectBuilder() {
@@ -37,7 +36,7 @@ public class ObjectGraphNode {
    }
 
    public boolean shouldWrap() {
-      return JxAnnotationTool.shouldWrapClass(objectBuilder.getInstanceClass()) && !wrapped;
+      return objectBuilder != null && JxAnnotationTool.shouldWrapClass(objectBuilder.getInstanceClass()) && !wrapped;
    }
 
    public boolean isWrapped() {

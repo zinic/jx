@@ -16,6 +16,7 @@ import net.jps.jx.jaxb.JaxbConstants;
  */
 public class ReflectiveMappedField implements MappedField {
 
+   private static final Class[] DEFAULT_NON_DESCENT_CLASSES = new Class[]{Class.class, String.class, Collection.class, Enum.class};
    private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
    private final XmlAttribute xmlAttributeAnnotation;
    private final XmlElement xmlElementAnnotation;
@@ -39,15 +40,25 @@ public class ReflectiveMappedField implements MappedField {
       setterRef = findSetter();
    }
 
-   public Field getFieldRef() {
+   @Override
+   public boolean hasGetter() {
+      return getterRef != null;
+   }
+
+   @Override
+   public boolean hasSetter() {
+      return setterRef != null;
+   }
+
+   protected Field getFieldRef() {
       return fieldRef;
    }
 
-   public Class getInstanceClass() {
+   protected Class getInstanceClass() {
       return instanceClass;
    }
 
-   public Object getInstanceRef() {
+   protected Object getInstanceRef() {
       return instanceRef;
    }
 
@@ -62,8 +73,24 @@ public class ReflectiveMappedField implements MappedField {
    }
 
    @Override
-   public boolean isCollection() {
-      return Collection.class.isAssignableFrom(fieldRef.getType());
+   public boolean shouldDescend() {
+      final Class fieldType = fieldRef.getType();
+
+      if (!fieldType.isPrimitive()) {
+         return shouldDescend(fieldType, DEFAULT_NON_DESCENT_CLASSES);
+      }
+
+      return false;
+   }
+
+   private boolean shouldDescend(Class fieldType, Class[] nonDescentRestrictions) {
+      for (Class nonDescentRestriction : nonDescentRestrictions) {
+         if (nonDescentRestriction.isAssignableFrom(fieldType)) {
+            return false;
+         }
+      }
+
+      return true;
    }
 
    private String getJaxbNameForField() {
@@ -137,33 +164,31 @@ public class ReflectiveMappedField implements MappedField {
 
    @Override
    public Object get() {
-      return invoke(getterRef);
+      return invoke(instanceRef, getterRef);
    }
 
    @Override
    public void set(Object value) {
-      final Class valueClass = value.getClass();
-
-      if (!fieldRef.getType().isAssignableFrom(valueClass)) {
-         throw new IllegalArgumentException("Value class being set: " + valueClass.getName() + " is not assignable to class: " + fieldRef.getType().getName());
+      if (setterRef == null) {
+         throw new IllegalStateException("No setter found for field: " + fieldRef.getName() + "::" + fieldRef.getType().getName() + " on class: " + instanceClass.getName());
       }
 
-      invoke(getterRef, value);
+      invoke(instanceRef, setterRef, value);
    }
 
-   public Object invoke(Method m) {
-      return invoke(m, EMPTY_OBJECT_ARRAY);
+   protected Object invoke(Object target, Method m) {
+      return invoke(target, m, EMPTY_OBJECT_ARRAY);
    }
 
-   public Object invoke(Method m, Object... args) {
+   protected Object invoke(Object target, Method m, Object... args) {
       try {
-         return m.invoke(instanceRef, args);
+         return m.invoke(target, args);
       } catch (IllegalAccessException iae) {
-         throw new ReflectionException("Unable to access method for invocation. Target method: " + setterRef.getName(), iae);
+         throw new ReflectionException("Unable to access method for invocation. Target method: " + m.getName(), iae);
       } catch (IllegalArgumentException iae) {
-         throw new ReflectionException("Illegal argument caught by underlying method during reflective call. Target method: " + setterRef.getName(), iae);
+         throw new ReflectionException("Illegal argument caught by underlying method during reflective call. Target method: " + m.getName(), iae);
       } catch (InvocationTargetException ite) {
-         throw new ReflectionException("Method invocation failed. Target method: " + setterRef.getName(), ite);
+         throw new ReflectionException("Method invocation failed. Target method: " + m.getName(), ite);
       }
    }
 }

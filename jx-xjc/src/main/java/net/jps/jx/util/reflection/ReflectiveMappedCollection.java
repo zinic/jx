@@ -1,9 +1,14 @@
 package net.jps.jx.util.reflection;
 
+import net.jps.jx.jackson.mapping.MappedCollection;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import net.jps.jx.jackson.mapping.ObjectGraphBuilder;
 
 /**
@@ -18,13 +23,30 @@ public class ReflectiveMappedCollection extends ReflectiveMappedField implements
    public ReflectiveMappedCollection(Field fieldRef, Object instanceRef) {
       super(fieldRef, instanceRef);
 
+      if (hasSetter()) {
+         final Object newCollectionInstance = newCollection(getFieldRef().getType());
+         set(newCollectionInstance);
+      }
+      
+      final Object collectionReference = get();
+      
       try {
-         addValueMethod = fieldRef.getType().getMethod("add", Object.class);
+         addValueMethod = collectionReference.getClass().getMethod("add", Object.class);
       } catch (Exception ex) {
-         throw new ReflectionException("Unable to locate add(...) method on collection: " + getInstanceClass().getName());
+         throw new ReflectionException("Unable to locate add(...) method on collection: " + getInstanceClass().getName(), ex);
       }
 
       collectionValueClass = getCollectionType();
+   }
+
+   private Object newCollection(Class collectionClass) {
+      if (List.class.isAssignableFrom(collectionClass)) {
+         return new ArrayList();
+      } else if (Collection.class.isAssignableFrom(collectionClass)) {
+         return new HashSet();
+      }
+
+      throw new ReflectionException("Unknown collection type: " + collectionClass.getName());
    }
 
    private Class getCollectionType() {
@@ -43,17 +65,17 @@ public class ReflectiveMappedCollection extends ReflectiveMappedField implements
 
       throw new ReflectionException("Unable to extract run time type information from collection generic template. No template present.");
    }
-   
+
    @Override
    public ObjectGraphBuilder newCollectionValue() {
-      final ObjectGraphBuilder newObjectGraphBuilder = ObjectGraphBuilder.builderFor(collectionValueClass);
-      add(newObjectGraphBuilder.getObjectInstance());
-      
+//      final ObjectGraphBuilder newObjectGraphBuilder = ObjectGraphBuilder.builderFor(collectionValueClass);
+//      add(newObjectGraphBuilder.getObjectInstance());
+
       return ObjectGraphBuilder.builderFor(collectionValueClass);
    }
 
    @Override
    public void add(Object obj) {
-      invoke(addValueMethod, get());
+      invoke(get(), addValueMethod, obj);
    }
 }

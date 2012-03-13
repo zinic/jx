@@ -1,9 +1,12 @@
 package net.jps.jx.jackson.mapping;
 
+import com.sun.org.apache.xerces.internal.jaxp.datatype.DatatypeFactoryImpl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import net.jps.jx.util.reflection.ReflectionException;
 
 /**
@@ -12,9 +15,15 @@ import net.jps.jx.util.reflection.ReflectionException;
  */
 public class DefaultObjectConstructor<T> {
 
+   private final DatatypeFactory datatypeFactory;
    private final Class<T> instanceClass;
 
    public DefaultObjectConstructor(Class<T> instanceClass) {
+      this(new DatatypeFactoryImpl(), instanceClass);
+   }
+
+   public DefaultObjectConstructor(DatatypeFactory datatypeFactory, Class<T> instanceClass) {
+      this.datatypeFactory = datatypeFactory;
       this.instanceClass = instanceClass;
    }
 
@@ -28,6 +37,12 @@ public class DefaultObjectConstructor<T> {
             } else {
                throw new ReflectionException("Unable to create instance for interface: " + instanceClass.getName());
             }
+         } else if (Enum.class.isAssignableFrom(instanceClass)) {
+            final T[] enumConstants = instanceClass.getEnumConstants();
+
+            return enumConstants[0];
+         } else if (XMLGregorianCalendar.class.equals(instanceClass)) {
+            return (T) datatypeFactory.newXMLGregorianCalendar();
          } else {
             return instanceClass.newInstance();
          }

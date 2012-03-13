@@ -1,4 +1,4 @@
-package net.jps.jx.util.reflection;
+package net.jps.jx.jackson.mapping;
 
 import net.jps.jx.jackson.mapping.ObjectGraphBuilder;
 

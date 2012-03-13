@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.util.Stack;
 import net.jps.jx.jackson.mapping.ObjectGraphBuilder;
 import net.jps.jx.jackson.mapping.ObjectGraphNode;
-import net.jps.jx.util.reflection.JxAnnotationTool;
-import net.jps.jx.util.reflection.MappedCollection;
+import net.jps.jx.jackson.mapping.MappedCollection;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
 
@@ -28,9 +27,11 @@ public class JxJsonReader<T> {
       final Stack<ObjectGraphNode> nodeStack = new Stack<ObjectGraphNode>();
 
       ObjectGraphNode currentGraphNode = new ObjectGraphNode(graphTrunk, null), selectedField = null;
-      
-      do {
-         switch (jsonParser.nextToken()) {
+
+      JsonToken jsonToken;
+
+      while ((jsonToken = jsonParser.nextToken()) != null) {
+         switch (jsonToken) {
             case FIELD_NAME:
                selectedField = currentGraphNode.getObjectBuilder().getField(jsonParser.getText());
 
@@ -40,8 +41,8 @@ public class JxJsonReader<T> {
                if (currentGraphNode.shouldWrap()) {
                   currentGraphNode.setWrapping(true);
                } else if (currentGraphNode.isCollection()) {
-                  // Moving to the next element
-                  final MappedCollection mappedCollection = currentGraphNode.getMappedCollection();
+                  // Moving to the next element in the collection
+                  final MappedCollection mappedCollection = (MappedCollection) currentGraphNode.getMappedField();
 
                   nodeStack.push(currentGraphNode);
                   currentGraphNode = new ObjectGraphNode(mappedCollection.newCollectionValue(), null);
@@ -57,7 +58,14 @@ public class JxJsonReader<T> {
                if (currentGraphNode.isWrapped()) {
                   currentGraphNode.setWrapping(false);
                } else {
-                  currentGraphNode = nodeStack.pop();
+                  final Object builtObjectInstance = currentGraphNode.getObjectBuilder().getObjectInstance();
+
+                  if (currentGraphNode.getMappedField() != null) {
+                     setOrAdd(currentGraphNode, builtObjectInstance);
+                  } else {
+                     currentGraphNode = nodeStack.pop();
+                     setOrAdd(currentGraphNode, builtObjectInstance);
+                  }
                }
 
                break;
@@ -66,8 +74,8 @@ public class JxJsonReader<T> {
                if (!selectedField.isCollection()) {
                   throw new RuntimeException("Unexpected collection start.");
                }
-               
-               nodeStack.push(selectedField);
+
+               nodeStack.push(currentGraphNode);
                currentGraphNode = selectedField;
 
                break;
@@ -109,8 +117,18 @@ public class JxJsonReader<T> {
 
                break;
          }
-      } while (jsonParser.hasCurrentToken());
+      }
 
       return graphTrunk;
+   }
+
+   public void setOrAdd(ObjectGraphNode currentGraphNode, Object builtObjectInstance) {
+      if (currentGraphNode.getMappedField() != null) {
+         if (currentGraphNode.isCollection()) {
+            ((MappedCollection) currentGraphNode.getMappedField()).add(builtObjectInstance);
+         } else {
+            currentGraphNode.getMappedField().set(builtObjectInstance);
+         }
+      }
    }
 }
