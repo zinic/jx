@@ -1,10 +1,15 @@
 package net.jps.jx.jackson;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Stack;
+import net.jps.jx.JsonReader;
+import net.jps.jx.JxParsingException;
+import net.jps.jx.jackson.mapping.FieldMapper;
 import net.jps.jx.jackson.mapping.ObjectGraphBuilder;
-import net.jps.jx.jackson.mapping.ObjectGraphNode;
+import net.jps.jx.jackson.mapping.ReaderGraphNode;
 import net.jps.jx.jackson.mapping.MappedCollection;
+import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
 
@@ -12,21 +17,30 @@ import org.codehaus.jackson.JsonToken;
  *
  * @author zinic
  */
-public class JxJsonReader<T> {
+public class JacksonJsonReader<T> implements JsonReader<T> {
 
-   private final JsonParser jsonParser;
+   private final FieldMapper fieldMapper;
+   private final JsonFactory jsonFactory;
    private final ObjectGraphBuilder<T> graphTrunk;
 
-   public JxJsonReader(JsonParser jsonParser, Class<T> objectGraphClass) {
-      this.jsonParser = jsonParser;
+   public JacksonJsonReader(JsonFactory jsonFactory, FieldMapper fieldMapper, Class<T> objectGraphClass) {
+      this.jsonFactory = jsonFactory;
+      this.fieldMapper = fieldMapper;
 
-      this.graphTrunk = ObjectGraphBuilder.builderFor(objectGraphClass);
+      this.graphTrunk = ObjectGraphBuilder.builderFor(objectGraphClass, fieldMapper);
    }
 
-   public ObjectGraphBuilder<T> render() throws IOException {
-      final Stack<ObjectGraphNode> nodeStack = new Stack<ObjectGraphNode>();
+   @Override
+   public T read(InputStream source) throws IOException, JxParsingException {
+      final JsonParser newParser = jsonFactory.createJsonParser(source);
+      
+      return render(newParser).getObjectInstance();
+   }
 
-      ObjectGraphNode currentGraphNode = new ObjectGraphNode(graphTrunk, null), selectedField = null;
+   public ObjectGraphBuilder<T> render(JsonParser jsonParser) throws IOException, JxParsingException {
+      final Stack<ReaderGraphNode> nodeStack = new Stack<ReaderGraphNode>();
+
+      ReaderGraphNode currentGraphNode = new ReaderGraphNode(graphTrunk, null), selectedField = null;
 
       JsonToken jsonToken;
 
@@ -45,7 +59,9 @@ public class JxJsonReader<T> {
                   final MappedCollection mappedCollection = (MappedCollection) currentGraphNode.getMappedField();
 
                   nodeStack.push(currentGraphNode);
-                  currentGraphNode = new ObjectGraphNode(mappedCollection.newCollectionValue(), null);
+                  
+                  final ObjectGraphBuilder collectionValueBuilder = ObjectGraphBuilder.builderFor(mappedCollection.getCollectionValueClass(), fieldMapper);
+                  currentGraphNode = new ReaderGraphNode(collectionValueBuilder, null);
                } else {
                   // Moving to the next field
                   nodeStack.push(currentGraphNode);
@@ -98,7 +114,12 @@ public class JxJsonReader<T> {
                break;
 
             case VALUE_NULL:
-               selectedField.getMappedField().set(null);
+               if (selectedField != null && selectedField.getMappedField() != null) {
+                  selectedField.getMappedField().set(null);
+               } else {
+                  System.out.println("TODO:Fix - Failure case trap. This is happening because of how nulls are outputted. No nulls, no problem.");
+               }
+               
                break;
 
             case VALUE_NUMBER_FLOAT:
@@ -114,15 +135,18 @@ public class JxJsonReader<T> {
                break;
 
             case VALUE_EMBEDDED_OBJECT:
+               throw new UnsupportedOperationException("Embedded object encountered. Log this as a bug with the a sample of your input, please.");
 
-               break;
+            case NOT_AVAILABLE:
+               throw new JxParsingException("Unavilable. Log this as a bug with the a sample of your input, please.");
+         
          }
       }
 
       return graphTrunk;
    }
 
-   public void setOrAdd(ObjectGraphNode currentGraphNode, Object builtObjectInstance) {
+   public void setOrAdd(ReaderGraphNode currentGraphNode, Object builtObjectInstance) {
       if (currentGraphNode.getMappedField() != null) {
          if (currentGraphNode.isCollection()) {
             ((MappedCollection) currentGraphNode.getMappedField()).add(builtObjectInstance);

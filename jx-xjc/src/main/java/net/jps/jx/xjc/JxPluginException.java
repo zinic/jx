@@ -1,4 +1,4 @@
-package net.jps.jx;
+package net.jps.jx.xjc;
 
 /**
  *

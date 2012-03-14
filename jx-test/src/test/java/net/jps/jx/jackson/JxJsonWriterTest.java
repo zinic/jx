@@ -7,6 +7,8 @@ import java.io.InputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
+import net.jps.jx.JsonWriter;
+import net.jps.jx.jackson.mapping.StaticFieldMapper;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.junit.Test;
@@ -32,18 +34,17 @@ public class JxJsonWriterTest {
          final Limits limits = unwrap(unmarshaller.unmarshal(inputStream));
 
          final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-         final JsonGenerator jsonGenerator = new JsonFactory().createJsonGenerator(baos);
 
-         final JxJsonWriter jsonWriter = new JxJsonWriter(jsonGenerator, limits);
-         
+         final JsonFactory jsonFactory = new JsonFactory();
+         final JsonWriter jsonWriter = new JacksonJsonWriter(jsonFactory, StaticFieldMapper.getInstance());
+
          try {
-            jsonWriter.write();
-            jsonGenerator.close();
+            jsonWriter.write(limits, baos);
          } catch (Throwable ex) {
             ex.printStackTrace(System.out);
          }
-         
-         System.out.println("JSON Output: " + new String(baos.toByteArray()));
+
+         System.out.println("JSON Output\n" + new String(baos.toByteArray()) + "\n");
       }
 
       public Limits unwrap(Object o) {

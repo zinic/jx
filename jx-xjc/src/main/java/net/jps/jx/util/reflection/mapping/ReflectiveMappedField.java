@@ -1,14 +1,14 @@
-package net.jps.jx.util.reflection;
+package net.jps.jx.util.reflection.mapping;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import net.jps.jx.annotation.JsonField;
 import net.jps.jx.jackson.mapping.MappedField;
 import net.jps.jx.jaxb.JaxbConstants;
+import net.jps.jx.util.reflection.ReflectionException;
 
 /**
  *
@@ -16,7 +16,6 @@ import net.jps.jx.jaxb.JaxbConstants;
  */
 public class ReflectiveMappedField implements MappedField {
 
-   private static final Class[] DEFAULT_NON_DESCENT_CLASSES = new Class[]{Class.class, String.class, Collection.class, Enum.class};
    private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
    private final XmlAttribute xmlAttributeAnnotation;
    private final XmlElement xmlElementAnnotation;
@@ -38,6 +37,11 @@ public class ReflectiveMappedField implements MappedField {
 
       getterRef = findGetter();
       setterRef = findSetter();
+   }
+
+   @Override
+   public Class getFieldType() {
+      return fieldRef.getType();
    }
 
    @Override
@@ -70,27 +74,6 @@ public class ReflectiveMappedField implements MappedField {
    @Override
    public boolean canSet() {
       return setterRef != null;
-   }
-
-   @Override
-   public boolean shouldDescend() {
-      final Class fieldType = fieldRef.getType();
-
-      if (!fieldType.isPrimitive()) {
-         return shouldDescend(fieldType, DEFAULT_NON_DESCENT_CLASSES);
-      }
-
-      return false;
-   }
-
-   private boolean shouldDescend(Class fieldType, Class[] nonDescentRestrictions) {
-      for (Class nonDescentRestriction : nonDescentRestrictions) {
-         if (nonDescentRestriction.isAssignableFrom(fieldType)) {
-            return false;
-         }
-      }
-
-      return true;
    }
 
    private String getJaxbNameForField() {

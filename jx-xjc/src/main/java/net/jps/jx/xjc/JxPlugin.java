@@ -1,4 +1,4 @@
-package net.jps.jx;
+package net.jps.jx.xjc;
 
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;

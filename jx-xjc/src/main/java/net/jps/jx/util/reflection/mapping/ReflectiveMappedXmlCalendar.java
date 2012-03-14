@@ -1,4 +1,4 @@
-package net.jps.jx.util.reflection;
+package net.jps.jx.util.reflection.mapping;
 
 import java.lang.reflect.Field;
 import javax.xml.datatype.DatatypeFactory;

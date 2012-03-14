@@ -6,6 +6,8 @@ package net.jps.jx.jackson.mapping;
  */
 public interface MappedField {
 
+   Class getFieldType();
+   
    String getName();
 
    Object get();
@@ -15,8 +17,6 @@ public interface MappedField {
    void set(Object value);
 
    boolean hasSetter();
-
-   boolean shouldDescend();
 
    boolean canSet();
 }

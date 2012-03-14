@@ -1,4 +1,4 @@
-package net.jps.jx.util.reflection;
+package net.jps.jx.util.reflection.mapping;
 
 import net.jps.jx.jackson.mapping.MappedCollection;
 import java.lang.reflect.Field;
@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import net.jps.jx.jackson.mapping.ObjectGraphBuilder;
+import net.jps.jx.util.reflection.ReflectionException;
 
 /**
  *
@@ -27,9 +28,9 @@ public class ReflectiveMappedCollection extends ReflectiveMappedField implements
          final Object newCollectionInstance = newCollection(getFieldRef().getType());
          set(newCollectionInstance);
       }
-      
+
       final Object collectionReference = get();
-      
+
       try {
          addValueMethod = collectionReference.getClass().getMethod("add", Object.class);
       } catch (Exception ex) {
@@ -67,11 +68,8 @@ public class ReflectiveMappedCollection extends ReflectiveMappedField implements
    }
 
    @Override
-   public ObjectGraphBuilder newCollectionValue() {
-//      final ObjectGraphBuilder newObjectGraphBuilder = ObjectGraphBuilder.builderFor(collectionValueClass);
-//      add(newObjectGraphBuilder.getObjectInstance());
-
-      return ObjectGraphBuilder.builderFor(collectionValueClass);
+   public Class getCollectionValueClass() {
+      return collectionValueClass;
    }
 
    @Override

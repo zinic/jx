@@ -8,10 +8,11 @@ import java.io.InputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
-import net.jps.jx.jackson.mapping.ObjectGraphBuilder;
+import net.jps.jx.JsonReader;
+import net.jps.jx.JsonWriter;
+import net.jps.jx.jackson.mapping.StaticFieldMapper;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonParser;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
@@ -37,22 +38,18 @@ public class JxJsonReaderTest {
          final ByteArrayOutputStream baos = new ByteArrayOutputStream();
          
          final JsonFactory jsonFactory = new JsonFactory();
-         final JsonGenerator jsonGenerator = jsonFactory.createJsonGenerator(baos);
-
-         final JxJsonWriter jsonWriter = new JxJsonWriter(jsonGenerator, limits);
+         final JsonWriter jsonWriter = new JacksonJsonWriter(jsonFactory, StaticFieldMapper.getInstance());
          
          try {
-            jsonWriter.write();
-            jsonGenerator.close();
+            jsonWriter.write(limits, baos);
          } catch (Throwable ex) {
             ex.printStackTrace(System.out);
          }
          
-         final JsonParser jsonParser = jsonFactory.createJsonParser(new ByteArrayInputStream(baos.toByteArray()));
-         final JxJsonReader<Limits> limitsReader = new JxJsonReader<Limits>(jsonParser, Limits.class);
-         final ObjectGraphBuilder<Limits> builder = limitsReader.render();
+         final JsonReader<Limits> limitsReader = new JacksonJsonReader<Limits>(jsonFactory, StaticFieldMapper.getInstance(), Limits.class);
+         final Limits bidirectionaledLimits = limitsReader.read(new ByteArrayInputStream(baos.toByteArray()));
          
-         System.out.println("Done. Built object: " + builder.getObjectInstance());
+         System.out.println("Done. Built object: " + bidirectionaledLimits);
       }
 
       public Limits unwrap(Object o) {
