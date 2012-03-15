@@ -64,3 +64,8 @@ XJC plugin.
 [An example of how to write out JSON content from a JAXB object graph](https://github.com/zinic/jx/blob/master/jx-test/src/test/java/net/jps/jx/jackson/JxJsonWriterTest.java)
 
 [An example of how to bind JSON content to a JAXB object graph](https://github.com/zinic/jx/blob/master/jx-test/src/test/java/net/jps/jx/jackson/JxJsonReaderTest.java)
+
+
+##That Legal Thing...##
+
+This software library is realease to you under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html). See [LICENSE](https://github.com/zinic/jx/blob/master/LICENSE) for more information.
