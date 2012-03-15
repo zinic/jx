@@ -8,9 +8,9 @@ Jx cuts out a lot of JXON's concerns by relying on the well established transfor
 
 ###Cool... so what's it do?###
 
-Jx allows you to annotate an XSD schema using JAXB schema customizations. These annotations are used to help direct the processing and generation of JSON structural renderings derived from the XSD schema in a predictable, type-safe manner.
+Jx allows you to annotate an XML schema document using JAXB binding customizations. These annotations are used to help direct the processing and generation of JSON structural renderings derived from the XSD in a predictable, type-safe manner.
 
-Jx makes it trivial to support XML and JSON with ONE schema contract (the XSD schema). Jx will automatically map both XML and JSON representations of the schema to the underlying Java JAXB classes.
+Jx makes it trivial to support XML and JSON with ONE schema contract (the XSD). Jx will automatically map both XML and JSON representations of the schema to the underlying Java JAXB classes.
 
 
 ##The Features##
