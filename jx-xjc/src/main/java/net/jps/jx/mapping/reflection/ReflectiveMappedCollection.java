@@ -1,6 +1,6 @@
-package net.jps.jx.util.reflection.mapping;
+package net.jps.jx.mapping.reflection;
 
-import net.jps.jx.jackson.mapping.MappedCollection;
+import net.jps.jx.mapping.MappedCollection;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import net.jps.jx.jackson.mapping.ObjectGraphBuilder;
+import net.jps.jx.jackson.mapping.ReaderGraphNodeValue;
 import net.jps.jx.util.reflection.ReflectionException;
 
 /**

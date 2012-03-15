@@ -1,6 +1,6 @@
-package net.jps.jx.util.reflection.mapping;
+package net.jps.jx.mapping.reflection;
 
-import net.jps.jx.jackson.mapping.MappedEnumeration;
+import net.jps.jx.mapping.MappedEnumeration;
 import java.lang.reflect.Field;
 import net.jps.jx.util.reflection.ReflectionException;
 

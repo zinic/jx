@@ -1,20 +1,20 @@
-package net.jps.jx.jackson.mapping;
+package net.jps.jx.mapping.reflection;
 
-import com.sun.org.apache.xerces.internal.jaxp.datatype.DatatypeFactoryImpl;
+import net.jps.jx.mapping.FieldMapper;
+import net.jps.jx.mapping.JsonNumberWriter;
+import net.jps.jx.mapping.MappedField;
+import net.jps.jx.json.JsonTypeDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
+import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import net.jps.jx.JxWritingException;
-import net.jps.jx.jackson.JsonType;
+import net.jps.jx.json.JsonType;
 import net.jps.jx.util.reflection.ClassTools;
-import net.jps.jx.util.reflection.mapping.ReflectiveMappedCollection;
-import net.jps.jx.util.reflection.mapping.ReflectiveMappedEnumeration;
-import net.jps.jx.util.reflection.mapping.ReflectiveMappedField;
-import net.jps.jx.util.reflection.mapping.ReflectiveMappedXmlCalendar;
 
 /**
  *
@@ -25,13 +25,20 @@ public class StaticFieldMapper implements FieldMapper {
    private static final Class[] STRING_CLASSES = new Class[]{XMLGregorianCalendar.class, String.class, Enum.class},
            ARRAY_CLASSES = new Class[]{Iterable.class},
            BOOLEAN_CLASSES = new Class[]{Boolean.class},
-           NUMBER_CLASSES = new Class[]{short.class, Short.class, int.class, Integer.class, long.class, Long.class, 
-              BigInteger.class, float.class, Float.class, double.class, Double.class, BigDecimal.class},
+           NUMBER_CLASSES = new Class[]{short.class, Short.class, int.class, Integer.class, long.class, Long.class,
+                              BigInteger.class, float.class, Float.class, double.class, Double.class, BigDecimal.class},
            
            // TODO:Enhancement - This should be changed to a generated white-list. Maybe like a class graph prescan?
            DEFAULT_NON_DESCENT_CLASSES = new Class[]{Class.class, String.class, Collection.class, Enum.class, XMLGregorianCalendar.class};
-   
-   private static final StaticFieldMapper MAPPER_INSTANCE = new StaticFieldMapper(new DatatypeFactoryImpl());
+   private static final StaticFieldMapper MAPPER_INSTANCE;
+
+   static {
+      try {
+         MAPPER_INSTANCE = new StaticFieldMapper(DatatypeFactory.newInstance());
+      } catch (DatatypeConfigurationException dce) {
+         throw new RuntimeException("Failed to init a datatype factory. Please see, http://docs.oracle.com/javase/1.5.0/docs/api/javax/xml/datatype/DatatypeFactory.html for more information.", dce);
+      }
+   }
 
    public static FieldMapper getInstance() {
       return MAPPER_INSTANCE;

@@ -3,6 +3,8 @@ package net.jps.jx.jackson.mapping;
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.Queue;
+import net.jps.jx.mapping.FieldMapper;
+import net.jps.jx.mapping.MappedField;
 import net.jps.jx.util.reflection.JxAnnotationTool;
 
 /**

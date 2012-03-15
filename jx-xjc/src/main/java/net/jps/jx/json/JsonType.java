@@ -1,4 +1,4 @@
-package net.jps.jx.jackson;
+package net.jps.jx.json;
 
 /**
  *

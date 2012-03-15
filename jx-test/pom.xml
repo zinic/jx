@@ -8,7 +8,7 @@
    <parent>
       <groupId>net.jps</groupId>
       <artifactId>jx</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
+      <version>0.2.1-SNAPSHOT</version>
    </parent>
    
    <groupId>net.jps</groupId>
@@ -31,6 +31,16 @@
       <dependency>
          <groupId>com.sun.xml.bind</groupId>
          <artifactId>jaxb-impl</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-api</artifactId>
+      </dependency>
+         
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-jdk14</artifactId>
       </dependency>
       
       <dependency>

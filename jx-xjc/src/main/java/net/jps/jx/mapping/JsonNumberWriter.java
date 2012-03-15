@@ -1,4 +1,4 @@
-package net.jps.jx.jackson.mapping;
+package net.jps.jx.mapping;
 
 import java.io.IOException;
 import java.math.BigDecimal;

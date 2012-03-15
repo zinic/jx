@@ -8,12 +8,11 @@
    <parent>
       <groupId>net.jps</groupId>
       <artifactId>jx</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
+      <version>0.2.1-SNAPSHOT</version>
    </parent>
    
    <groupId>net.jps</groupId>
    <artifactId>jx-xjc</artifactId>
-   <version>0.1.0-SNAPSHOT</version>
    
    <packaging>jar</packaging>
    
@@ -35,6 +34,16 @@
       <dependency>
          <groupId>org.codehaus.jackson</groupId>
          <artifactId>jackson-core-asl</artifactId>
+      </dependency>
+      
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-api</artifactId>
+      </dependency>
+         
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-jdk14</artifactId>
       </dependency>
       
       <dependency>

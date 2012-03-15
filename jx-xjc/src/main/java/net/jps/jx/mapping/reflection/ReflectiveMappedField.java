@@ -1,4 +1,4 @@
-package net.jps.jx.util.reflection.mapping;
+package net.jps.jx.mapping.reflection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import net.jps.jx.annotation.JsonField;
-import net.jps.jx.jackson.mapping.MappedField;
+import net.jps.jx.mapping.MappedField;
 import net.jps.jx.jaxb.JaxbConstants;
 import net.jps.jx.util.reflection.ReflectionException;
 

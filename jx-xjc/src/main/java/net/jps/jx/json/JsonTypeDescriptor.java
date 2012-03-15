@@ -1,6 +1,6 @@
-package net.jps.jx.jackson.mapping;
+package net.jps.jx.json;
 
-import net.jps.jx.jackson.JsonType;
+import net.jps.jx.json.JsonType;
 
 /**
  *

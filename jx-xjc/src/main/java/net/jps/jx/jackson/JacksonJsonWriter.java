@@ -1,15 +1,22 @@
 package net.jps.jx.jackson;
 
+import net.jps.jx.mapping.FieldMapper;
+import net.jps.jx.mapping.JsonNumberWriter;
+import net.jps.jx.mapping.MappedField;
+import net.jps.jx.json.JsonTypeDescriptor;
+import net.jps.jx.jackson.mapping.WriterGraphNode;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Stack;
 import net.jps.jx.JsonWriter;
 import net.jps.jx.JxWritingException;
-import net.jps.jx.jackson.mapping.*;
+import net.jps.jx.jackson.mapping.JacksonNumberWriter;
 import net.jps.jx.util.reflection.ReflectionException;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -26,7 +33,9 @@ import org.codehaus.jackson.JsonGenerator;
  */
 public class JacksonJsonWriter<T> implements JsonWriter<T> {
 
-   public static boolean IGNORE_NULLS = true;
+   private static final Logger LOG = LoggerFactory.getLogger(JacksonJsonWriter.class);
+   
+   public volatile boolean IGNORE_NULLS = true;
    
    private final JsonFactory jsonFactory;
    private final FieldMapper fieldMapper;
@@ -59,10 +68,10 @@ public class JacksonJsonWriter<T> implements JsonWriter<T> {
 
                   // Get the node's next field
                   final MappedField nextField = currentGraphNode.nextMappedField();
-                  
+
                   // Process the object
                   final Object nextFieldValue = nextField.get();
-                  
+
                   if (nextFieldValue != null || !IGNORE_NULLS) {
                      jsonGenerator.writeFieldName(nextField.getName());
                      processObject(nextField.get(), jsonGenerator, jsonNumberWriter, graphNodeStack, iteratorStack);
@@ -91,20 +100,30 @@ public class JacksonJsonWriter<T> implements JsonWriter<T> {
             }
          }
       } catch (Exception ex) {
-         System.out.println("Exception caught during writing. Failure reason: " + ex.getMessage());
-         System.out.println("Object Graph Stack Dump");
-
+         if (LOG.isDebugEnabled()) {
+         final StringBuilder outputBuilder = new StringBuilder("Exception caught during writing. Failure reason: ");
+         outputBuilder.append(ex.getMessage()).append("\nObject Graph Stack Dump");
 
          while (!graphNodeStack.isEmpty()) {
             final WriterGraphNode wgn = graphNodeStack.pop();
 
-            System.out.println("Object Graph Node: object:" + wgn.getValueObject().toString() + " - class: " + wgn.getValueObject().getClass().getName() + " - toString: " + wgn.getValueObject().toString());
+            outputBuilder.append("Object Graph Node: object:").append(wgn.getValueObject().toString()).append(" - class: ");
+            outputBuilder.append(wgn.getValueObject().getClass().getName()).append(" - toString: ").append(wgn.getValueObject().toString());
          }
 
-         ex.printStackTrace(System.out);
+         LOG.error(outputBuilder.toString(), ex);
+         }
+         
+         if (ex instanceof JxWritingException) {
+            throw (JxWritingException) ex;
+         }
+         
+         throw new JxWritingException("Failed to write object graph to output stream as JSON. Reason: " + ex.getMessage(), ex);
+      } finally {
+         if (jsonGenerator != null) {
+            jsonGenerator.close();
+         }
       }
-
-      jsonGenerator.close();
    }
 
    private WriterGraphNode processObject(Object valueBeingWritten, JsonGenerator jsonGenerator, JsonNumberWriter jsonNumberWriter, Stack<WriterGraphNode> graphNodeStack, Stack<Iterator> iteratorStack) throws ReflectionException, IOException, JxWritingException {

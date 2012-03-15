@@ -1,5 +1,6 @@
 package net.jps.jx.jackson.mapping;
 
+import net.jps.jx.mapping.JsonNumberWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;

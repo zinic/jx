@@ -1,11 +1,10 @@
-package net.jps.jx.jackson.mapping;
+package net.jps.jx.mapping;
 
+import net.jps.jx.json.JsonTypeDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import net.jps.jx.JxWritingException;
-import net.jps.jx.jackson.JsonType;
 import net.jps.jx.util.reflection.ReflectionException;
-import org.codehaus.jackson.JsonGenerator;
 
 /**
  *
