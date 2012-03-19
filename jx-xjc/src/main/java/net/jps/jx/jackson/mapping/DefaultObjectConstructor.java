@@ -29,7 +29,9 @@ public class DefaultObjectConstructor<T> {
 
    public T newInstance() {
       try {
-         if (instanceClass.isInterface()) {
+         if (isPrimative()) {
+            return constructPrimativeWrapper();
+         } else if (instanceClass.isInterface()) {
             if (List.class.equals(instanceClass)) {
                return (T) new ArrayList();
             } else if (Collection.class.equals(instanceClass)) {
@@ -53,5 +55,45 @@ public class DefaultObjectConstructor<T> {
       } catch (InstantiationException ie) {
          throw new ReflectionException("Constructor invocation failed. Target class: " + instanceClass.getName(), ie);
       }
+   }
+
+   public T constructPrimativeWrapper() {
+      Object instanceObject = null;
+
+      if (Double.class.equals(instanceClass)) {
+         instanceObject = Double.valueOf(Double.MIN_VALUE);
+      } else if (Float.class.equals(instanceClass)) {
+         instanceObject = Float.valueOf(Float.MIN_VALUE);
+      } else if (Long.class.equals(instanceClass)) {
+         instanceObject = Long.valueOf(Long.MIN_VALUE);
+      } else if (Integer.class.equals(instanceClass)) {
+         instanceObject = Integer.valueOf(Integer.MIN_VALUE);
+      } else if (Short.class.equals(instanceClass)) {
+         instanceObject = Short.valueOf(Short.MIN_VALUE);
+      } else if (Boolean.class.equals(instanceClass)) {
+         instanceObject = Boolean.FALSE;
+      }
+
+      return (T) instanceObject;
+   }
+
+   public boolean isPrimative() {
+      boolean primative = false;
+
+      if (Float.class.equals(instanceClass)) {
+         primative = true;
+      } else if (Double.class.equals(instanceClass)) {
+         primative = true;
+      } else if (Short.class.equals(instanceClass)) {
+         primative = true;
+      } else if (Integer.class.equals(instanceClass)) {
+         primative = true;
+      } else if (Long.class.equals(instanceClass)) {
+         primative = true;
+      } else if (Boolean.class.equals(instanceClass)) {
+         primative = true;
+      }
+
+      return primative;
    }
 }

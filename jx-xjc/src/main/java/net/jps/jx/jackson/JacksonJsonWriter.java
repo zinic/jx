@@ -35,7 +35,7 @@ public class JacksonJsonWriter<T> implements JsonWriter<T> {
 
    private static final Logger LOG = LoggerFactory.getLogger(JacksonJsonWriter.class);
    
-   public volatile boolean IGNORE_NULLS = true;
+   public static volatile boolean ignoreNulls = true;
    
    private final JsonFactory jsonFactory;
    private final FieldMapper fieldMapper;
@@ -72,7 +72,7 @@ public class JacksonJsonWriter<T> implements JsonWriter<T> {
                   // Process the object
                   final Object nextFieldValue = nextField.get();
 
-                  if (nextFieldValue != null || !IGNORE_NULLS) {
+                  if (nextFieldValue != null || !ignoreNulls) {
                      jsonGenerator.writeFieldName(nextField.getName());
                      processObject(nextField.get(), jsonGenerator, jsonNumberWriter, graphNodeStack, iteratorStack);
                   }

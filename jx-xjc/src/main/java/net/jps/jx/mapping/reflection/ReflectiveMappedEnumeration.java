@@ -25,8 +25,6 @@ public class ReflectiveMappedEnumeration extends ReflectiveMappedField implement
 
       if (enumConstants != null && enumConstants.length > 0) {
          for (Enum enumConstant : enumConstants) {
-            System.out.println("Checking \"" + enumerationValue + "\" against \"" + enumConstant.name() + "\"");
-
             if (enumConstant.name().equals(enumerationValue)) {
                super.set(enumConstant);
                return;

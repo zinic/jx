@@ -1,0 +1,19 @@
+{
+   "stringFields" : [
+      {
+         "stringField" : "string_1"
+      },
+      {
+         "stringField" : "string_2"
+      },
+      {
+         "stringField" : "string_3"
+      },
+      {
+         "stringField" : "string_4"
+      },
+      {
+         "stringField" : "string_5"
+      }
+   ]
+}

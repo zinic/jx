@@ -1,0 +1,7 @@
+{
+   "doubleVal" : 2.4,
+   "number" : 1,
+   "not-default" : "remapped-string-field",
+   "non-default" : "remapped-string-field",
+   "stringField" : "default-string-field"
+}

@@ -1,0 +1,19 @@
+{
+   "doubleVal" : 2.4,
+   "number" : 1,
+   "not-default" : "remapped-string-field",
+   "non-default" : {
+      "testing" : "1",
+      "number" : 2.4,
+      "object" : {
+        "field" : "1234",
+        "number" : 1
+      },
+      "otherValues" : [
+         {
+           "collection" : [ "a", "b", "c" ] 
+         }
+      ]
+   },
+   "stringField" : "default-string-field"
+}

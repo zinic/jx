@@ -19,13 +19,17 @@ public class JacksonNumberWriter implements JsonNumberWriter {
    public JacksonNumberWriter(JsonGenerator gen) {
       this.gen = gen;
    }
+   
+   private JxWritingException handleJsonGenerationException(JsonGenerationException jge) {
+      return new JxWritingException("Failed to write number. Reason: " + jge.getMessage(), jge);
+   }
 
    @Override
    public void writeNumber(String string) throws IOException, JxWritingException {
       try {
          gen.writeNumber(string);
       } catch (JsonGenerationException jge) {
-         throw new JxWritingException("Failed to write number. Reason: " + jge.getMessage(), jge);
+         throw handleJsonGenerationException(jge);
       }
    }
 
@@ -34,7 +38,7 @@ public class JacksonNumberWriter implements JsonNumberWriter {
       try {
          gen.writeNumber(bd);
       } catch (JsonGenerationException jge) {
-         throw new JxWritingException("Failed to write number. Reason: " + jge.getMessage(), jge);
+         throw handleJsonGenerationException(jge);
       }
    }
 
@@ -43,7 +47,7 @@ public class JacksonNumberWriter implements JsonNumberWriter {
       try {
          gen.writeNumber(f);
       } catch (JsonGenerationException jge) {
-         throw new JxWritingException("Failed to write number. Reason: " + jge.getMessage(), jge);
+         throw handleJsonGenerationException(jge);
       }
    }
 
@@ -52,7 +56,7 @@ public class JacksonNumberWriter implements JsonNumberWriter {
       try {
          gen.writeNumber(d);
       } catch (JsonGenerationException jge) {
-         throw new JxWritingException("Failed to write number. Reason: " + jge.getMessage(), jge);
+         throw handleJsonGenerationException(jge);
       }
    }
 
@@ -61,7 +65,7 @@ public class JacksonNumberWriter implements JsonNumberWriter {
       try {
          gen.writeNumber(bi);
       } catch (JsonGenerationException jge) {
-         throw new JxWritingException("Failed to write number. Reason: " + jge.getMessage(), jge);
+         throw handleJsonGenerationException(jge);
       }
    }
 
@@ -70,7 +74,7 @@ public class JacksonNumberWriter implements JsonNumberWriter {
       try {
          gen.writeNumber(l);
       } catch (JsonGenerationException jge) {
-         throw new JxWritingException("Failed to write number. Reason: " + jge.getMessage(), jge);
+         throw handleJsonGenerationException(jge);
       }
    }
 
@@ -79,7 +83,7 @@ public class JacksonNumberWriter implements JsonNumberWriter {
       try {
          gen.writeNumber(i);
       } catch (JsonGenerationException jge) {
-         throw new JxWritingException("Failed to write number. Reason: " + jge.getMessage(), jge);
+         throw handleJsonGenerationException(jge);
       }
    }
 }

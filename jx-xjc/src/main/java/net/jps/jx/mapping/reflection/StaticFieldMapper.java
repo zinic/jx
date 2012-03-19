@@ -36,7 +36,8 @@ public class StaticFieldMapper implements FieldMapper {
       try {
          MAPPER_INSTANCE = new StaticFieldMapper(DatatypeFactory.newInstance());
       } catch (DatatypeConfigurationException dce) {
-         throw new RuntimeException("Failed to init a datatype factory. Please see, http://docs.oracle.com/javase/1.5.0/docs/api/javax/xml/datatype/DatatypeFactory.html for more information.", dce);
+         throw new MissingDatatypeFactoryException("Failed to init a datatype factory. "
+                 + "Please see, http://docs.oracle.com/javase/1.5.0/docs/api/javax/xml/datatype/DatatypeFactory.html for more information.", dce);
       }
    }
 
@@ -114,7 +115,7 @@ public class StaticFieldMapper implements FieldMapper {
 
    @Override
    public boolean shouldDescend(Class type) {
-      if (!type.isPrimitive()) {
+      if (!type.isPrimitive() && !ClassTools.classMatches(type, NUMBER_CLASSES)) {
          return !ClassTools.classIsAssignableTo(type, DEFAULT_NON_DESCENT_CLASSES);
       }
 
