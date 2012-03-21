@@ -39,7 +39,7 @@ public class JacksonJsonWriterTest {
          assertEquals("", expected.getDefault(), rendered.getDefault());
          assertEquals("", expected.getJsonNumber(), rendered.getJsonNumber());
          assertEquals("", expected.getStringField(), rendered.getStringField());
-         assertEquals("", expected.getXmlDouble(), rendered.getXmlDouble());
+         assertEquals("", Double.valueOf(expected.getXmlDouble()), Double.valueOf(rendered.getXmlDouble()));
       }
    }
 }
