@@ -34,7 +34,7 @@ public class TestClasses {
 
       @JsonField("doubleVal")
       @XmlElement(name = "doubleValue")
-      private Double xmlDouble;
+      private double xmlDouble;
       @JsonField("number")
       private Integer jsonNumber;
       @XmlAttribute(name = "not-default")
@@ -68,7 +68,7 @@ public class TestClasses {
          this.stringField = stringField;
       }
 
-      public Double getXmlDouble() {
+      public double getXmlDouble() {
          return xmlDouble;
       }
 

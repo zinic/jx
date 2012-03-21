@@ -63,7 +63,7 @@ public class JacksonJsonReaderTest {
 
          assertEquals("", "remapped-string-field", materializedObject.getDefault());
          assertEquals("", Integer.valueOf(1), materializedObject.getJsonNumber());
-         assertEquals("", Double.valueOf(2.4), materializedObject.getXmlDouble());
+         assertEquals("", Double.valueOf(2.4), Double.valueOf(materializedObject.getXmlDouble()));
          assertEquals("", "default-string-field", materializedObject.getStringField());
       }
 
@@ -76,7 +76,7 @@ public class JacksonJsonReaderTest {
 
          assertNull("", materializedObject.getDefault());
          assertEquals("", Integer.valueOf(1), materializedObject.getJsonNumber());
-         assertEquals("", Double.valueOf(2.4), materializedObject.getXmlDouble());
+         assertEquals("", Double.valueOf(2.4), Double.valueOf(materializedObject.getXmlDouble()));
          assertEquals("", "default-string-field", materializedObject.getStringField());
       }
 
@@ -89,7 +89,7 @@ public class JacksonJsonReaderTest {
 
          assertEquals("", "remapped-string-field", materializedObject.getDefault());
          assertEquals("", Integer.valueOf(1), materializedObject.getJsonNumber());
-         assertEquals("", Double.valueOf(2.4), materializedObject.getXmlDouble());
+         assertEquals("", Double.valueOf(2.4), Double.valueOf(materializedObject.getXmlDouble()));
          assertEquals("", "default-string-field", materializedObject.getStringField());
       }
       
@@ -102,7 +102,7 @@ public class JacksonJsonReaderTest {
 
          assertEquals("", "remapped-string-field", materializedObject.getDefault());
          assertEquals("", Integer.valueOf(1), materializedObject.getJsonNumber());
-         assertEquals("", Double.valueOf(2.4), materializedObject.getXmlDouble());
+         assertEquals("", Double.valueOf(2.4), Double.valueOf(materializedObject.getXmlDouble()));
          assertEquals("", "default-string-field", materializedObject.getStringField());
       }
    }
