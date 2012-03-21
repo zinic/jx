@@ -34,15 +34,23 @@ import org.slf4j.LoggerFactory;
 public class JacksonJsonWriter<T> implements JsonWriter<T> {
 
    private static final Logger LOG = LoggerFactory.getLogger(JacksonJsonWriter.class);
-   
-   public static volatile boolean ignoreNulls = true;
-   
+   private volatile boolean ignoreNulls;
    private final JsonFactory jsonFactory;
    private final FieldMapper fieldMapper;
 
    public JacksonJsonWriter(JsonFactory jsonFactory, FieldMapper fieldMapper) {
       this.jsonFactory = jsonFactory;
       this.fieldMapper = fieldMapper;
+
+      ignoreNulls = true;
+   }
+
+   public boolean willIgnoreNulls() {
+      return ignoreNulls;
+   }
+
+   public void setIgnoreNulls(boolean ignoreNulls) {
+      this.ignoreNulls = ignoreNulls;
    }
 
    @Override
@@ -99,8 +107,23 @@ public class JacksonJsonWriter<T> implements JsonWriter<T> {
                }
             }
          }
-      } catch (Exception ex) {
-         if (LOG.isDebugEnabled()) {
+      } catch (JxWritingException jwe) {
+         unwindObjectGraphStack(jwe, graphNodeStack);
+
+         throw jwe;
+      } catch (ReflectionException ex) {
+         unwindObjectGraphStack(ex, graphNodeStack);
+
+         throw new JxWritingException("Failed to write object graph to output stream as JSON. Reason: " + ex.getMessage(), ex);
+      } finally {
+         if (jsonGenerator != null) {
+            jsonGenerator.close();
+         }
+      }
+   }
+
+   private void unwindObjectGraphStack(Exception ex, Stack<WriterGraphNode> graphNodeStack) {
+      if (LOG.isDebugEnabled()) {
          final StringBuilder outputBuilder = new StringBuilder("Exception caught during writing. Failure reason: ");
          outputBuilder.append(ex.getMessage()).append("\nObject Graph Stack Dump");
 
@@ -112,21 +135,10 @@ public class JacksonJsonWriter<T> implements JsonWriter<T> {
          }
 
          LOG.error(outputBuilder.toString(), ex);
-         }
-         
-         if (ex instanceof JxWritingException) {
-            throw (JxWritingException) ex;
-         }
-         
-         throw new JxWritingException("Failed to write object graph to output stream as JSON. Reason: " + ex.getMessage(), ex);
-      } finally {
-         if (jsonGenerator != null) {
-            jsonGenerator.close();
-         }
       }
    }
 
-   private WriterGraphNode processObject(Object valueBeingWritten, JsonGenerator jsonGenerator, JsonNumberWriter jsonNumberWriter, Stack<WriterGraphNode> graphNodeStack, Stack<Iterator> iteratorStack) throws ReflectionException, IOException, JxWritingException {
+   private WriterGraphNode processObject(Object valueBeingWritten, JsonGenerator jsonGenerator, JsonNumberWriter jsonNumberWriter, Stack<WriterGraphNode> graphNodeStack, Stack<Iterator> iteratorStack) throws IOException, JxWritingException {
       // Check the value of the next field
       final JsonTypeDescriptor jtd = fieldMapper.getJsonType(valueBeingWritten);
       WriterGraphNode newGraphNode = null;

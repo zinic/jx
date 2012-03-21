@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ReaderGraphNodeValue<T> {
    
-   public static <T> ReaderGraphNodeValue builderFor(Class<T> instanceClass, FieldMapper fieldMapper) throws ReflectionException {
+   public static <T> ReaderGraphNodeValue builderFor(Class<T> instanceClass, FieldMapper fieldMapper) {
       return new ReaderGraphNodeValue(new DefaultObjectConstructor<T>(instanceClass).newInstance());
    }
    

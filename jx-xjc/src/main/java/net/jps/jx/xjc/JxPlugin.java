@@ -1,6 +1,5 @@
 package net.jps.jx.xjc;
 
-import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.tools.xjc.Options;
@@ -9,7 +8,6 @@ import com.sun.tools.xjc.model.*;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import net.jps.jx.annotation.JsonField;

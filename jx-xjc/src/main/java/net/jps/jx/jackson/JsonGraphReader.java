@@ -20,11 +20,9 @@ import org.slf4j.LoggerFactory;
 public class JsonGraphReader<T> {
 
    private static final Logger LOG = LoggerFactory.getLogger(JsonGraphReader.class);
-   
    private final Stack<ReaderGraphNode> graphNodeStack = new Stack<ReaderGraphNode>();
    private final ReaderGraphNodeValue<T> graphTrunk;
    private final FieldMapper fieldMapper;
-   
    private boolean shouldSkip;
    private int skipDepth;
 
@@ -54,11 +52,7 @@ public class JsonGraphReader<T> {
                readToken(jsonParser, jsonToken, currentGraphNode);
             }
          }
-      } catch (Exception ex) {
-         if (ex instanceof JxParsingException) {
-            throw (JxParsingException) ex;
-         }
-
+      } catch (ReflectionException ex) {
          throw new JxParsingException("Parsing JSON input failed. Reason: " + ex.getMessage(), ex);
       }
 
@@ -87,6 +81,16 @@ public class JsonGraphReader<T> {
             endArray(currentGraphNode);
             break;
 
+         case NOT_AVAILABLE:
+            throw new JxParsingException("NOT_AVAILABLE: Log this as a bug with the a sample of your input, please.");
+
+         default:
+            readValueToken(jsonParser, jsonToken, currentGraphNode);
+      }
+   }
+
+   public void readValueToken(JsonParser jsonParser, JsonToken jsonToken, ReaderGraphNode currentGraphNode) throws IOException, JxParsingException {
+      switch (jsonToken) {
          case VALUE_TRUE:
             setObject(currentGraphNode, Boolean.TRUE);
             break;
@@ -119,14 +123,14 @@ public class JsonGraphReader<T> {
             }
 
             break;
-
-         case NOT_AVAILABLE:
-            throw new JxParsingException("NOT_AVAILABLE: Log this as a bug with the a sample of your input, please.");
       }
    }
 
    public void readSkipToken(JsonToken jsonToken) throws JxParsingException {
       switch (jsonToken) {
+         case NOT_AVAILABLE:
+            throw new JxParsingException("NOT_AVAILABLE: Log this as a bug with the a sample of your input, please.");
+
          case START_OBJECT:
          case START_ARRAY:
             skipDepth++;
@@ -136,19 +140,9 @@ public class JsonGraphReader<T> {
          case END_ARRAY:
             skipDepth--;
 
-         case VALUE_TRUE:
-         case VALUE_FALSE:
-         case VALUE_NULL:
-         case VALUE_NUMBER_FLOAT:
-         case VALUE_NUMBER_INT:
-         case VALUE_STRING:
-         case VALUE_EMBEDDED_OBJECT:
+         default:
             updateSkip();
             break;
-
-         case NOT_AVAILABLE:
-            throw new JxParsingException("NOT_AVAILABLE: Log this as a bug with the a sample of your input, please.");
-
       }
    }
 
@@ -185,7 +179,7 @@ public class JsonGraphReader<T> {
       }
    }
 
-   public void startObject(ReaderGraphNode currentGraphNode) throws ReflectionException {
+   public void startObject(ReaderGraphNode currentGraphNode) {
       // Moving to the next field. We'll finish with this node later
       graphNodeStack.push(currentGraphNode);
 
