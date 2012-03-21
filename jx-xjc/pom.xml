@@ -6,12 +6,12 @@
    <modelVersion>4.0.0</modelVersion>
    
    <parent>
-      <groupId>net.jps</groupId>
+      <groupId>net.jps.jx</groupId>
       <artifactId>jx</artifactId>
       <version>0.2.1-SNAPSHOT</version>
    </parent>
    
-   <groupId>net.jps</groupId>
+   <groupId>net.jps.jx</groupId>
    <artifactId>jx-xjc</artifactId>
    
    <packaging>jar</packaging>
