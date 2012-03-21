@@ -132,7 +132,7 @@
          <xs:element name="limit" type="limits:RateLimit" minOccurs="1" maxOccurs="unbounded">
             <xs:annotation>
                <xs:appinfo>
-                  <jx:map as="limits" />
+                  <jx:map as="ivgnaeoijgioaejgioaejgioaejgeioaj" />
                </xs:appinfo>
             </xs:annotation>
          </xs:element>

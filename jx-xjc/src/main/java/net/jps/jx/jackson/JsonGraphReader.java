@@ -228,15 +228,15 @@ public class JsonGraphReader<T> {
    public void setNumber(ReaderGraphNode fieldGraphNode, Number number) throws JxParsingException {
       final Class fieldType = fieldGraphNode.getMappedField().getFieldType();
 
-      if (Double.class.equals(fieldType)) {
+      if (double.class.equals(fieldType) || Double.class.equals(fieldType) ) {
          setObject(fieldGraphNode, Double.valueOf(number.doubleValue()));
-      } else if (Float.class.equals(fieldType)) {
+      } else if (float.class.equals(fieldType) || Float.class.equals(fieldType)) {
          setObject(fieldGraphNode, Float.valueOf(number.floatValue()));
-      } else if (Long.class.equals(fieldType)) {
+      } else if (long.class.equals(fieldType) || Long.class.equals(fieldType)) {
          setObject(fieldGraphNode, Long.valueOf(number.longValue()));
-      } else if (Integer.class.equals(fieldType)) {
+      } else if (int.class.equals(fieldType) || Integer.class.equals(fieldType)) {
          setObject(fieldGraphNode, Integer.valueOf(number.intValue()));
-      } else if (Short.class.equals(fieldType)) {
+      } else if (short.class.equals(fieldType) || Short.class.equals(fieldType)) {
          setObject(fieldGraphNode, Short.valueOf(number.shortValue()));
       }
    }

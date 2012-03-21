@@ -1,6 +1,5 @@
 package net.jps.jx.jackson.mapping;
 
-import com.sun.org.apache.xerces.internal.jaxp.datatype.DatatypeFactoryImpl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,10 +16,6 @@ public class DefaultObjectConstructor<T> {
 
    private final DatatypeFactory datatypeFactory;
    private final Class<T> instanceClass;
-
-   public DefaultObjectConstructor(Class<T> instanceClass) {
-      this(new DatatypeFactoryImpl(), instanceClass);
-   }
 
    public DefaultObjectConstructor(DatatypeFactory datatypeFactory, Class<T> instanceClass) {
       this.datatypeFactory = datatypeFactory;

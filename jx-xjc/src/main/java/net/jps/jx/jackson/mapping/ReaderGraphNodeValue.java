@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import net.jps.jx.util.reflection.*;
+import net.jps.jx.util.xml.DatatypeFactoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public class ReaderGraphNodeValue<T> {
    
    public static <T> ReaderGraphNodeValue builderFor(Class<T> instanceClass, FieldMapper fieldMapper) {
-      return new ReaderGraphNodeValue(new DefaultObjectConstructor<T>(instanceClass).newInstance());
+      return new ReaderGraphNodeValue(new DefaultObjectConstructor<T>(DatatypeFactoryManager.getInstance(), instanceClass).newInstance());
    }
    
    private static final Logger LOG = LoggerFactory.getLogger(ReaderGraphNodeValue.class);
