@@ -13,7 +13,6 @@
    
    <groupId>net.jps</groupId>
    <artifactId>jx-xjc-test</artifactId>
-   <version>0.1.0-SNAPSHOT</version>
    
    <packaging>jar</packaging>
    
