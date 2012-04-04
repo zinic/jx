@@ -89,7 +89,7 @@ public class ReflectiveMappedField implements MappedField {
    }
 
    private Method findGetter() {
-      final String getterMethodName = formatGetterMethodName(fieldRef.getName(), instanceClass);
+      final String getterMethodName = formatGetterMethodName(fieldRef.getName(), fieldRef.getType());
 
       for (Method method : instanceClass.getMethods()) {
          if (method.getName().equals(getterMethodName)) {
