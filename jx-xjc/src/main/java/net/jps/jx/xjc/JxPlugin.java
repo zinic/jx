@@ -42,7 +42,7 @@ public class JxPlugin extends Plugin {
 
    @Override
    public boolean isCustomizationTagName(String nsUri, String localName) {
-      LOG.info("isCustomizationTagName for \"" + nsUri + ":" + localName + "\" - " + (jxNamespace.equals(nsUri) && JxLocalName.isLocalName(localName)));
+//      LOG.info("isCustomizationTagName for \"" + nsUri + ":" + localName + "\" - " + (jxNamespace.equals(nsUri) && JxLocalName.isLocalName(localName)));
 
       return jxNamespace.equals(nsUri) && JxLocalName.isLocalName(localName);
    }
@@ -69,9 +69,6 @@ public class JxPlugin extends Plugin {
          readClassAnnotations(classOutline, classCustomizations);
 
          for (FieldOutline fieldOutline : classOutline.getDeclaredFields()) {
-            LOG.info("Field: " + fieldOutline.getPropertyInfo().displayName() + " - Type: " + fieldOutline.getRawType().name());
-
-//            markCollection(collectionClass, classOutline, fieldOutline);
             readFieldAnnotations(classOutline, fieldOutline);
          }
       }
@@ -86,20 +83,6 @@ public class JxPlugin extends Plugin {
    public void readFieldAnnotations(ClassOutline classOutline, FieldOutline fieldOutline) {
       readMapAnnotation(classOutline, fieldOutline);
    }
-
-//   public void markCollection(JClass collectionClass, ClassOutline classOutline, FieldOutline fieldOutline) {
-//      if (fieldOutline.getRawType() instanceof JClass) {
-//         final JClass jclassType = (JClass) fieldOutline.getRawType();
-//
-//         if (collectionClass.isAssignableFrom(jclassType) && !jclassType.getTypeParameters().isEmpty()) {
-//            final JClass collectionType = jclassType.getTypeParameters().get(0);
-//            
-//            final JDefinedClass jclass = classOutline.implClass;
-//            final JFieldVar o = jclass.fields().get(fieldOutline.getPropertyInfo().getName(false));
-////            o.annotate(jclass.owner().ref(CollectionType.class)).param("value", collectionType.);
-//         }
-//      }
-//   }
 
    public void readMapAnnotation(ClassOutline classOutline, FieldOutline fieldOutline) {
       final CPluginCustomization mapAnnotation = fieldOutline.getPropertyInfo().getCustomizations().find(jxNamespace, JxLocalName.ATTRIBUTE_MAP.toString());
@@ -121,7 +104,7 @@ public class JxPlugin extends Plugin {
       final CPluginCustomization wrapCustomization = classCustomizations.find(jxNamespace, JxLocalName.ELEMENT_VALUE_MAP.toString());
 
       if (wrapCustomization != null) {
-         LOG.info("Found wrap annotation. This class should be annotated.");
+         LOG.info("Found value map annotation.");
 
          handleWrappedType(classOutline);
          wrapCustomization.markAsAcknowledged();
