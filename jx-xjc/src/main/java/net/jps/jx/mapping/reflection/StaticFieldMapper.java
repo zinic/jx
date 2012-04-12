@@ -1,6 +1,6 @@
 package net.jps.jx.mapping.reflection;
 
-import net.jps.jx.mapping.FieldMapper;
+import net.jps.jx.mapping.ClassMapper;
 import net.jps.jx.mapping.JsonNumberWriter;
 import net.jps.jx.mapping.MappedField;
 import net.jps.jx.json.JsonTypeDescriptor;
@@ -20,7 +20,7 @@ import net.jps.jx.util.reflection.ClassTools;
  *
  * @author zinic
  */
-public class StaticFieldMapper implements FieldMapper {
+public class StaticFieldMapper implements ClassMapper {
 
    private static final Class[] STRING_CLASSES = new Class[]{XMLGregorianCalendar.class, String.class, Enum.class},
            ARRAY_CLASSES = new Class[]{Iterable.class},
@@ -41,7 +41,7 @@ public class StaticFieldMapper implements FieldMapper {
       }
    }
 
-   public static FieldMapper getInstance() {
+   public static ClassMapper getInstance() {
       return MAPPER_INSTANCE;
    }
    private final DatatypeFactory datatypeFactory;
@@ -51,7 +51,7 @@ public class StaticFieldMapper implements FieldMapper {
    }
 
    @Override
-   public JsonTypeDescriptor getJsonType(Object value) {
+   public JsonTypeDescriptor describeJsonType(Object value) {
       if (value == null) {
          return new JsonTypeDescriptor(null, JsonType.NULL);
       }
@@ -99,17 +99,17 @@ public class StaticFieldMapper implements FieldMapper {
    }
 
    @Override
-   public MappedField mapField(Field field, Object fieldOwnerInstance) {
+   public MappedField mapField(Field field) {
       final Class fieldType = field.getType();
 
       if (Collection.class.isAssignableFrom(fieldType)) {
-         return new ReflectiveMappedCollection(field, fieldOwnerInstance);
+         return new ReflectiveMappedCollection(field);
       } else if (Enum.class.isAssignableFrom(fieldType)) {
-         return new ReflectiveMappedEnumeration(field, fieldOwnerInstance);
+         return new ReflectiveMappedEnumeration(field);
       } else if (XMLGregorianCalendar.class.isAssignableFrom(fieldType)) {
-         return new ReflectiveMappedXmlCalendar(field, fieldOwnerInstance, datatypeFactory);
+         return new ReflectiveMappedXmlCalendar(field, datatypeFactory);
       } else {
-         return new ReflectiveMappedField(field, fieldOwnerInstance);
+         return new ReflectiveMappedField(field);
       }
    }
 

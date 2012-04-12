@@ -1,78 +1,64 @@
 package net.jps.jx.mapping.reflection;
 
-import net.jps.jx.mapping.MappedCollection;
+import net.jps.jx.mapping.MappedCollectionField;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import net.jps.jx.mapping.method.CollectionAddMethod;
 import net.jps.jx.util.reflection.ReflectionException;
 
 /**
  *
  * @author zinic
  */
-public class ReflectiveMappedCollection extends ReflectiveMappedField implements MappedCollection {
+public class ReflectiveMappedCollection extends ReflectiveMappedField implements MappedCollectionField {
 
-   private final Class collectionValueClass;
-   private final Method addValueMethod;
+    private final Class collectionValueClass;
+    private final Method addValueMethod;
 
-   public ReflectiveMappedCollection(Field fieldRef, Object instanceRef) {
-      super(fieldRef, instanceRef);
+    public ReflectiveMappedCollection(Field fieldRef) {
+        super(fieldRef);
 
-      if (hasSetter()) {
-         final Object newCollectionInstance = newCollection(getFieldRef().getType());
-         set(newCollectionInstance);
-      }
+        try {
+            addValueMethod = fieldRef.getType().getMethod("add", Object.class);
+        } catch (Exception ex) {
+            throw new ReflectionException("Unable to locate add(...) method on collection: " + fieldRef.getType().getName(), ex);
+        }
 
-      final Object collectionReference = get();
+        collectionValueClass = getCollectionType();
+    }
 
-      try {
-         addValueMethod = collectionReference.getClass().getMethod("add", Object.class);
-      } catch (Exception ex) {
-         throw new ReflectionException("Unable to locate add(...) method on collection: " + getInstanceClass().getName(), ex);
-      }
+    private Class getCollectionType() {
+        final Type collectionValueType = getField().getGenericType();
 
-      collectionValueClass = getCollectionType();
-   }
+        if (collectionValueType instanceof ParameterizedType) {
+            final ParameterizedType pType = (ParameterizedType) collectionValueType;
+            final Type[] typeArguments = pType.getActualTypeArguments();
 
-   private Object newCollection(Class collectionClass) {
-      if (List.class.isAssignableFrom(collectionClass)) {
-         return new ArrayList();
-      } else if (Collection.class.isAssignableFrom(collectionClass)) {
-         return new HashSet();
-      }
+            if (typeArguments.length > 0 && typeArguments[0] != null && typeArguments[0] instanceof Class) {
+                return (Class) typeArguments[0];
+            }
 
-      throw new ReflectionException("Unknown collection type: " + collectionClass.getName());
-   }
+            throw new ReflectionException("Unable to extract run time type information from collection generic template. Not enough infomration present.");
+        }
 
-   private Class getCollectionType() {
-      final Type collectionValueType = getFieldRef().getGenericType();
+        throw new ReflectionException("Unable to extract run time type information from collection generic template. No template present.");
+    }
 
-      if (collectionValueType instanceof ParameterizedType) {
-         final ParameterizedType pType = (ParameterizedType) collectionValueType;
-         final Type[] typeArguments = pType.getActualTypeArguments();
+    @Override
+    public Class getCollectionValueClass() {
+        return collectionValueClass;
+    }
 
-         if (typeArguments.length > 0 && typeArguments[0] != null && typeArguments[0] instanceof Class) {
-            return (Class) typeArguments[0];
-         }
+    @Override
+    public CollectionAddMethod addMethodFor(final Object addTarget) {
+        return new CollectionAddMethod() {
 
-         throw new ReflectionException("Unable to extract run time type information from collection generic template. Not enough infomration present.");
-      }
-
-      throw new ReflectionException("Unable to extract run time type information from collection generic template. No template present.");
-   }
-
-   @Override
-   public Class getCollectionValueClass() {
-      return collectionValueClass;
-   }
-
-   @Override
-   public void add(Object obj) {
-      invoke(get(), addValueMethod, obj);
-   }
+            @Override
+            public void add(Object obj) {
+                invoke(addTarget, addValueMethod, obj);
+            }
+        };
+    }
 }

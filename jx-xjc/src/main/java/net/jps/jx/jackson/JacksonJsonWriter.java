@@ -1,6 +1,6 @@
 package net.jps.jx.jackson;
 
-import net.jps.jx.mapping.FieldMapper;
+import net.jps.jx.mapping.ClassMapper;
 import net.jps.jx.mapping.JsonNumberWriter;
 import net.jps.jx.mapping.MappedField;
 import net.jps.jx.json.JsonTypeDescriptor;
@@ -36,9 +36,9 @@ public class JacksonJsonWriter<T> implements JsonWriter<T> {
    private static final Logger LOG = LoggerFactory.getLogger(JacksonJsonWriter.class);
    private volatile boolean ignoreNulls;
    private final JsonFactory jsonFactory;
-   private final FieldMapper fieldMapper;
+   private final ClassMapper fieldMapper;
 
-   public JacksonJsonWriter(JsonFactory jsonFactory, FieldMapper fieldMapper) {
+   public JacksonJsonWriter(JsonFactory jsonFactory, ClassMapper fieldMapper) {
       this.jsonFactory = jsonFactory;
       this.fieldMapper = fieldMapper;
 
@@ -78,12 +78,12 @@ public class JacksonJsonWriter<T> implements JsonWriter<T> {
                   final MappedField nextField = currentGraphNode.nextMappedField();
 
                   // Process the object
-                  final Object nextFieldValue = nextField.get();
+//                  final Object nextFieldValue = nextField.get();
 
-                  if (nextFieldValue != null || !ignoreNulls) {
-                     jsonGenerator.writeFieldName(nextField.getName());
-                     processObject(nextField.get(), jsonGenerator, jsonNumberWriter, graphNodeStack, iteratorStack);
-                  }
+//                  if (nextFieldValue != null || !ignoreNulls) {
+//                     jsonGenerator.writeFieldName(nextField.getName());
+//                     processObject(nextField.get(), jsonGenerator, jsonNumberWriter, graphNodeStack, iteratorStack);
+//                  }
                } else {
                   // Done with this object
                   jsonGenerator.writeEndObject();
@@ -140,7 +140,7 @@ public class JacksonJsonWriter<T> implements JsonWriter<T> {
 
    private WriterGraphNode processObject(Object valueBeingWritten, JsonGenerator jsonGenerator, JsonNumberWriter jsonNumberWriter, Stack<WriterGraphNode> graphNodeStack, Stack<Iterator> iteratorStack) throws IOException, JxWritingException {
       // Check the value of the next field
-      final JsonTypeDescriptor jtd = fieldMapper.getJsonType(valueBeingWritten);
+      final JsonTypeDescriptor jtd = fieldMapper.describeJsonType(valueBeingWritten);
       WriterGraphNode newGraphNode = null;
 
       // TODO:Review - The JsonType helps direct marshalling of Java classes? Duno... kinda dig it.

@@ -1,22 +1,24 @@
 package net.jps.jx.mapping;
 
+import net.jps.jx.mapping.method.AccessorMethod;
+import net.jps.jx.mapping.method.SetterMethod;
+import java.lang.reflect.Field;
+
 /**
  *
  * @author zinic
  */
 public interface MappedField {
 
-   Class getFieldType();
-   
-   String getName();
+    String getName();
+    
+    Field getField();
 
-   Object get();
+    boolean hasGetter();
 
-   boolean hasGetter();
+    boolean hasSetter();
 
-   void set(Object value);
+    SetterMethod getSetterFor(Object setterTarget);
 
-   boolean hasSetter();
-
-   boolean canSet();
+    AccessorMethod getAccessorFor(Object accessorTarget);
 }

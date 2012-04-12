@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import net.jps.jx.JsonReader;
 import net.jps.jx.JxParsingException;
-import net.jps.jx.mapping.FieldMapper;
+import net.jps.jx.jackson.mapping.ClassCrawler;
+import net.jps.jx.jackson.mapping.ClassDescriptor;
+import net.jps.jx.JxControls;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParser;
 
@@ -14,22 +16,22 @@ import org.codehaus.jackson.JsonParser;
  */
 public class JacksonJsonReader<T> implements JsonReader<T> {
 
-   private final FieldMapper fieldMapper;
-   private final JsonFactory jsonFactory;
-   private final Class<T> graphTrunkClass;
+    private final JsonFactory jsonFactory;
+    private final ClassDescriptor<T> trunkClassDescriptor;
+    private final JxControls jxControls;
+    
+    public JacksonJsonReader(JsonFactory jsonFactory, JxControls jxControls, Class<T> trunkClass) {
+        this.jsonFactory = jsonFactory;
+        this.jxControls = jxControls;
+        
+        final ClassCrawler crawler = new ClassCrawler(jxControls.getClassMapper(), trunkClass);
+        trunkClassDescriptor = crawler.getGraph();
+    }
 
-   public JacksonJsonReader(JsonFactory jsonFactory, FieldMapper fieldMapper, Class<T> graphTrunkClass) {
-      this.jsonFactory = jsonFactory;
-      this.fieldMapper = fieldMapper;
+    @Override
+    public T read(InputStream source) throws IOException, JxParsingException {
+        final JsonParser newParser = jsonFactory.createJsonParser(source);
 
-      this.graphTrunkClass = graphTrunkClass;
-   }
-
-   @Override
-   public T read(InputStream source) throws IOException, JxParsingException {
-      final JsonParser newParser = jsonFactory.createJsonParser(source);
-      final JsonGraphReader<T> jsonGraphReader = new JsonGraphReader<T>(graphTrunkClass, fieldMapper);
-
-      return jsonGraphReader.render(newParser).getFieldOwnerInstance();
-   }
+        return new JsonGraphReader<T>(trunkClassDescriptor, jxControls.getClassMapper(), jxControls.getObjectConstructor()).render(newParser);
+    }
 }

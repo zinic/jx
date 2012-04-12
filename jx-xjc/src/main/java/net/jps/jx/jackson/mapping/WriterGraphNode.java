@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import net.jps.jx.mapping.FieldMapper;
+import net.jps.jx.mapping.ClassMapper;
 import net.jps.jx.mapping.MappedField;
 import net.jps.jx.util.reflection.JxAnnotationTool;
 import net.jps.jx.util.reflection.ReflectionException;
@@ -24,7 +24,7 @@ public class WriterGraphNode {
     private final Boolean shouldDescend;
     private Boolean wrapped;
 
-    public WriterGraphNode(Object valueObject, FieldMapper fieldMapper) {
+    public WriterGraphNode(Object valueObject, ClassMapper fieldMapper) {
         this.shouldDescend = fieldMapper.shouldDescend(valueObject.getClass());
         this.valueObject = valueObject;
 
@@ -45,7 +45,7 @@ public class WriterGraphNode {
             for (Field valueObjectField : allObjectFields) {
                 if (JxAnnotationTool.isInterestedInField(valueObjectField)) {
                     try {
-                        valueObjectFields.add(fieldMapper.mapField(valueObjectField, valueObject));
+//                        valueObjectFields.add(fieldMapper.mapField(valueObjectField, valueObject));
                     } catch (ReflectionException re) {
                         LOG.warn("Unable to map field " + valueObject.getClass().getCanonicalName()
                                 + "::" + valueObjectField.getName() + ". Reason: " + re.getMessage());
