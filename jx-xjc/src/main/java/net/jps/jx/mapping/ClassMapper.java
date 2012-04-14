@@ -13,8 +13,11 @@ public interface ClassMapper {
 
     MappedField mapField(Field f);
 
-    JsonTypeDescriptor describeJsonType(Object object);
+    JsonTypeDescriptor describeJsonType(Class type);
 
+    boolean isCollection(Class type);
+    
+    // TODO: ISP/SRP violation - move this to JxControls
     void writeNumber(Object number, JsonNumberWriter jsonNumberWriter) throws IOException, JxWritingException;
 
     boolean shouldDescend(Class type);

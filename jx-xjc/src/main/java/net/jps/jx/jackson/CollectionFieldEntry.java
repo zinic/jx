@@ -28,6 +28,10 @@ public class CollectionFieldEntry {
     public Class getCollectionValueClass() {
         return collectionValueClass;
     }
+    
+    public void add(Object collection, Object value) {
+        mappedCollection.addMethodFor(collection).add(value);
+    }
 
     private static Class getCollectionType(Field fieldRef) {
         final Type collectionValueType = fieldRef.getGenericType();

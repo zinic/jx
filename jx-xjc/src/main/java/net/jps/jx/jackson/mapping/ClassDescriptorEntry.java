@@ -20,11 +20,11 @@ public class ClassDescriptorEntry {
         nextFieldIterator = this.fieldDescriptorBuilders.iterator();
     }
 
-    public List<FieldDescriptorBuilder> getClassFields() {
+    public List<FieldDescriptorBuilder> fieldDescriptorBuilders() {
         return fieldDescriptorBuilders;
     }
 
-    public ClassDescriptorBuilder getClassDescriptorBuilder() {
+    public ClassDescriptorBuilder classDescriptorBuilder() {
         return classDescriptorBuilder;
     }
 

@@ -54,37 +54,44 @@ public class DefaultObjectConstructor implements ObjectConstructor {
     public <T> T constructPrimativeWrapper(Class<T> instanceClass) {
         Object instanceObject = null;
 
-        if (Double.class.equals(instanceClass)) {
-            instanceObject = Double.valueOf(Double.MIN_VALUE);
-        } else if (Float.class.equals(instanceClass)) {
-            instanceObject = Float.valueOf(Float.MIN_VALUE);
-        } else if (Long.class.equals(instanceClass)) {
-            instanceObject = Long.valueOf(Long.MIN_VALUE);
-        } else if (Integer.class.equals(instanceClass)) {
-            instanceObject = Integer.valueOf(Integer.MIN_VALUE);
-        } else if (Short.class.equals(instanceClass)) {
-            instanceObject = Short.valueOf(Short.MIN_VALUE);
-        } else if (Boolean.class.equals(instanceClass)) {
+        if (float.class.equals(instanceClass) || Float.class.equals(instanceClass)) {
+            instanceObject = Double.valueOf(0);
+        } else if (double.class.equals(instanceClass) || Double.class.equals(instanceClass)) {
+            instanceObject = Double.valueOf(0);
+        } else if (short.class.equals(instanceClass) || Short.class.equals(instanceClass)) {
+            instanceObject = Double.valueOf(0);
+        } else if (int.class.equals(instanceClass) || Integer.class.equals(instanceClass)) {
+            instanceObject = Integer.valueOf(0);
+        } else if (long.class.equals(instanceClass) || Long.class.equals(instanceClass)) {
+            instanceObject = Long.valueOf(0);
+        } else if (byte.class.equals(instanceClass) || byte.class.equals(instanceClass)) {
+            instanceObject = Byte.valueOf((byte) 0);
+        } else if (char.class.equals(instanceClass) || char.class.equals(instanceClass)) {
+            instanceObject = Character.valueOf((char) 0);
+        } else if (boolean.class.equals(instanceClass) || Boolean.class.equals(instanceClass)) {
             instanceObject = Boolean.FALSE;
         }
-
         return (T) instanceObject;
     }
 
     public boolean isPrimative(Class instanceClass) {
         boolean primative = false;
 
-        if (Float.class.equals(instanceClass)) {
+        if (float.class.equals(instanceClass) || Float.class.equals(instanceClass)) {
             primative = true;
-        } else if (Double.class.equals(instanceClass)) {
+        } else if (double.class.equals(instanceClass) || Double.class.equals(instanceClass)) {
             primative = true;
-        } else if (Short.class.equals(instanceClass)) {
+        } else if (short.class.equals(instanceClass) || Short.class.equals(instanceClass)) {
             primative = true;
-        } else if (Integer.class.equals(instanceClass)) {
+        } else if (int.class.equals(instanceClass) || Integer.class.equals(instanceClass)) {
             primative = true;
-        } else if (Long.class.equals(instanceClass)) {
+        } else if (long.class.equals(instanceClass) || Long.class.equals(instanceClass)) {
             primative = true;
-        } else if (Boolean.class.equals(instanceClass)) {
+        } else if (byte.class.equals(instanceClass) || byte.class.equals(instanceClass)) {
+            primative = true;
+        } else if (char.class.equals(instanceClass) || char.class.equals(instanceClass)) {
+            primative = true;
+        } else if (boolean.class.equals(instanceClass) || Boolean.class.equals(instanceClass)) {
             primative = true;
         }
 

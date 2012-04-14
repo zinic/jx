@@ -1,5 +1,6 @@
 package net.jps.jx.jackson;
 
+import java.util.LinkedList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -83,6 +84,7 @@ public class TestClasses {
       private List<OneStringField> stringFields;
 
       public CollectionFields() {
+          stringFields = new LinkedList<OneStringField>();
       }
 
       public List<OneStringField> getStringFields() {

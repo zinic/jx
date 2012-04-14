@@ -22,12 +22,12 @@ import org.slf4j.LoggerFactory;
 public class JsonGraphReader<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(JsonGraphReader.class);
-    private final Stack<ReaderGraphNode> readerNodeStack;
+    private final Stack<GraphNode> readerNodeStack;
     private final Stack<CollectionFieldEntry> collectionFieldEntryStack;
-//    private final ReaderGraphNodeValue<T> graphTrunk;
     private final ClassDescriptor<T> graphTrunkClass;
     private final ObjectConstructor objectConstructor;
     private final ClassMapper classMapper;
+    // TODO: replace these two suckers with an immutable aggregration class
     private boolean shouldSkip;
     private int skipDepth;
 
@@ -38,7 +38,7 @@ public class JsonGraphReader<T> {
 
         skipDepth = 0;
         shouldSkip = false;
-        readerNodeStack = new Stack<ReaderGraphNode>();
+        readerNodeStack = new Stack<GraphNode>();
         collectionFieldEntryStack = new Stack<CollectionFieldEntry>();
     }
 
@@ -48,7 +48,7 @@ public class JsonGraphReader<T> {
 
         try {
             graphTrunk = objectConstructor.newInstance(graphTrunkClass.getDescribedClass());
-            readerNodeStack.push(new ReaderGraphNode(graphTrunk, graphTrunkClass));
+            readerNodeStack.push(new GraphNode(graphTrunk, graphTrunkClass));
 
             while ((jsonToken = jsonParser.nextToken()) != null) {
                 if (readerNodeStack.isEmpty()) {
@@ -58,7 +58,7 @@ public class JsonGraphReader<T> {
                 if (shouldSkip) {
                     readSkipToken(jsonToken);
                 } else {
-                    final ReaderGraphNode currentGraphNode = readerNodeStack.pop();
+                    final GraphNode currentGraphNode = readerNodeStack.pop();
                     readToken(jsonParser, jsonToken, currentGraphNode);
                 }
             }
@@ -69,7 +69,7 @@ public class JsonGraphReader<T> {
         return graphTrunk;
     }
 
-    public void readToken(JsonParser jsonParser, JsonToken jsonToken, ReaderGraphNode currentGraphNode) throws IOException, JxParsingException {
+    public void readToken(JsonParser jsonParser, JsonToken jsonToken, GraphNode currentGraphNode) throws IOException, JxParsingException {
         switch (jsonToken) {
             case FIELD_NAME:
                 selectField(jsonParser.getText(), currentGraphNode);
@@ -99,7 +99,7 @@ public class JsonGraphReader<T> {
         }
     }
 
-    public void readValueToken(JsonParser jsonParser, JsonToken jsonToken, ReaderGraphNode currentGraphNode) throws IOException, JxParsingException {
+    public void readValueToken(JsonParser jsonParser, JsonToken jsonToken, GraphNode currentGraphNode) throws IOException, JxParsingException {
         switch (jsonToken) {
             case VALUE_TRUE:
                 setObject(currentGraphNode, Boolean.TRUE);
@@ -160,7 +160,7 @@ public class JsonGraphReader<T> {
         shouldSkip = skipDepth > 0;
     }
 
-    public void selectField(String fieldName, ReaderGraphNode currentGraphNode) throws JxParsingException {
+    public void selectField(String fieldName, GraphNode currentGraphNode) throws JxParsingException {
         // Finish with this node later.
         readerNodeStack.push(currentGraphNode);
 
@@ -170,40 +170,44 @@ public class JsonGraphReader<T> {
             LOG.debug("Encountered field that has no mapped equal. This will be ignored. Field: " + fieldName);
             shouldSkip = true;
         } else {
-            final ClassDescriptor fieldTypeDescriptor = selectedField.getTypeDescriptor();
-            final Object fieldInstance = objectConstructor.newInstance(fieldTypeDescriptor.getDescribedClass());
-
             // Push the new field to process it next.
-            readerNodeStack.push(new ReaderGraphNode(fieldInstance, selectedField));
+            readerNodeStack.push(newGraphNode(currentGraphNode, selectedField));
 
             // Is this a collection? Add a collection field entry then.
-            if (isCollection(classMapper.describeJsonType(selectedField.getTypeDescriptor()))) {
+            if (isCollection(classMapper.describeJsonType(selectedField.getTypeDescriptor().getDescribedClass()))) {
                 collectionFieldEntryStack.push(new CollectionFieldEntry(selectedField));
             }
         }
     }
 
-    public void startArray(ReaderGraphNode currentGraphNode) throws JxParsingException {
+    public GraphNode newGraphNode(GraphNode graphNode, FieldDescriptor field) {
+        final Object presetFieldInstance = graphNode.get(field);
+        final Object fieldInstance = presetFieldInstance == null ? objectConstructor.newInstance(field.getTypeDescriptor().getDescribedClass()) : presetFieldInstance;
+        
+        return new GraphNode(fieldInstance, field);
+    }
+
+    public void startArray(GraphNode currentGraphNode) throws JxParsingException {
         final Class currentNodeClass = currentGraphNode.getClassDescriptor().getDescribedClass();
 
-        if (isCollection(classMapper.describeJsonType(currentNodeClass))) {
+        if (!isCollection(classMapper.describeJsonType(currentNodeClass))) {
             throw new JxParsingException("Unexpected collection start.");
         }
 
         readerNodeStack.push(currentGraphNode);
     }
 
-    public void endArray(ReaderGraphNode currentGraphNode) throws JxParsingException {
+    public void endArray(GraphNode currentGraphNode) throws JxParsingException {
         final Class currentNodeClass = currentGraphNode.getClassDescriptor().getDescribedClass();
 
-        if (isCollection(classMapper.describeJsonType(currentNodeClass))) {
+        if (!isCollection(classMapper.describeJsonType(currentNodeClass))) {
             throw new JxParsingException("Unexpected collection start.");
         }
 
         collectionFieldEntryStack.pop();
     }
 
-    public void startObject(ReaderGraphNode currentGraphNode) {
+    public void startObject(GraphNode currentGraphNode) {
         final Class currentNodeClass = currentGraphNode.getClassDescriptor().getDescribedClass();
 
         // Moving to the next field. We'll finish with this node later
@@ -218,13 +222,13 @@ public class JsonGraphReader<T> {
             // Moving to the next element in the collection so we'll create a new object instance.
             final MappedCollectionField mappedCollection = collectionField.getMappedCollection();
             final Object collectionValueInstance = objectConstructor.newInstance(mappedCollection.getCollectionValueClass());
-            
-            // TODO: THIS IS NOT EFFICIENT :x
+
+            // TODO: THIS IS NOT EFFICIENT :x - cache it
             // Crawl the new object's class graph.
             final ClassCrawler crawler = new ClassCrawler(classMapper, mappedCollection.getCollectionValueClass());
 
             // Push a new inspector for the collection value we're building
-            readerNodeStack.push(new ReaderGraphNode(collectionValueInstance, crawler.getGraph()));
+            readerNodeStack.push(new GraphNode(collectionValueInstance, crawler.getGraph()));
         }
     }
 
@@ -232,7 +236,7 @@ public class JsonGraphReader<T> {
         return jsonTypeDescriptor.getJsonType() == JsonType.ARRAY;
     }
 
-    public void endObject(ReaderGraphNode currentGraphNode) throws JxParsingException {
+    public void endObject(GraphNode currentGraphNode) throws JxParsingException {
         if (currentGraphNode.wasWrapped()) {
             // Object is wrapped. Ignore this end object token.
             readerNodeStack.push(currentGraphNode);
@@ -250,7 +254,7 @@ public class JsonGraphReader<T> {
         }
     }
 
-    public void setNumber(ReaderGraphNode fieldGraphNode, Number number) throws JxParsingException {
+    public void setNumber(GraphNode fieldGraphNode, Number number) throws JxParsingException {
         final Class fieldType = fieldGraphNode.getClassDescriptor().getDescribedClass();
 
         if (double.class.equals(fieldType) || Double.class.equals(fieldType)) {
@@ -266,22 +270,22 @@ public class JsonGraphReader<T> {
         }
     }
 
-    public void setObject(ReaderGraphNode fieldGraphNode, Object builtObjectInstance) throws JxParsingException {
+    public void setObject(GraphNode fieldGraphNode, Object builtObjectInstance) throws JxParsingException {
         if (fieldGraphNode == null) {
             // TODO:Fix - Failure case trap
             throw new JxParsingException("TODO:Fix - Failure case trap. This is happening because of how nulls are currently outputted. No nulls, no problem.");
         }
 
         try {
-            fieldGraphNode.getMappedField().getSetterFor(readerNodeStack.peek().getInstance()).set(builtObjectInstance);
+            readerNodeStack.peek().set(fieldGraphNode.getFieldDescriptor(), builtObjectInstance);
         } catch (ReflectionException re) {
             throw new JxParsingException("Failed to set/add value on the selected graph node.", re);
         }
     }
 
-    public void add(ReaderGraphNode collectionGraphNode, Object builtObjectInstance) throws JxParsingException {
+    public void add(GraphNode collectionGraphNode, Object builtObjectInstance) throws JxParsingException {
         try {
-            collectionFieldEntryStack.peek().getMappedCollection().addMethodFor(readerNodeStack.peek().getInstance()).add(builtObjectInstance);
+            collectionFieldEntryStack.peek().add(collectionGraphNode.getInstance(), builtObjectInstance);
         } catch (ReflectionException re) {
             throw new JxParsingException("Failed to set/add value on the selected graph node.", re);
         }

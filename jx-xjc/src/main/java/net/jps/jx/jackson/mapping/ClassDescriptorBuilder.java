@@ -17,7 +17,7 @@ public class ClassDescriptorBuilder {
         describedFields = new LinkedList<FieldDescriptor>();
     }
 
-    public void addField(FieldDescriptor fieldDescriptor) {
+    public void addFieldDescriptor(FieldDescriptor fieldDescriptor) {
         describedFields.add(fieldDescriptor);
     }
 

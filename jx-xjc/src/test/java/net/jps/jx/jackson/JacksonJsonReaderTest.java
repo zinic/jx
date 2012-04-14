@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+import net.jps.jx.JxControls;
 import net.jps.jx.JxControlsImpl;
 import net.jps.jx.JxParsingException;
 import net.jps.jx.mapping.reflection.StaticFieldMapper;
@@ -29,7 +30,7 @@ public class JacksonJsonReaderTest {
     public static class TestParent {
         
         protected JsonFactory jsonFactory;
-        protected JxControlsImpl jxControls;
+        protected JxControls jxControls;
         
         @Before
         public void standUp() throws DatatypeConfigurationException {
@@ -50,7 +51,7 @@ public class JacksonJsonReaderTest {
             assertEquals("Json string field must be mapped and set correctly.", "test", materializedObject.getStringField());
         }
         
-        @Test(expected = JxParsingException.class) @Ignore
+        @Test(expected = JxParsingException.class)
         public void shouldCatchUnexpectedCollections() throws Exception {
             final JacksonJsonReader<OneStringField> jsonReader = new JacksonJsonReader<OneStringField>(jsonFactory, jxControls, OneStringField.class);
             
@@ -60,7 +61,7 @@ public class JacksonJsonReaderTest {
             assertEquals("Json string field must be mapped and set correctly.", "test", materializedObject.getStringField());
         }
         
-        @Test @Ignore
+        @Test
         public void shouldReadAnnotatedFields() throws Exception {
             final JacksonJsonReader<MultiFieldMixedAnnotations> jsonReader = new JacksonJsonReader<MultiFieldMixedAnnotations>(jsonFactory, jxControls, MultiFieldMixedAnnotations.class);
             
@@ -73,7 +74,7 @@ public class JacksonJsonReaderTest {
             assertEquals("", "default-string-field", materializedObject.getStringField());
         }
         
-        @Test @Ignore
+        @Test
         public void shouldReadAnnotatedFieldsWithPartialJsonPayload() throws Exception {
             final JacksonJsonReader<MultiFieldMixedAnnotations> jsonReader = new JacksonJsonReader<MultiFieldMixedAnnotations>(jsonFactory, jxControls, MultiFieldMixedAnnotations.class);
             
@@ -86,7 +87,7 @@ public class JacksonJsonReaderTest {
             assertEquals("", "default-string-field", materializedObject.getStringField());
         }
         
-        @Test @Ignore
+        @Test
         public void shouldSkipExtraFields() throws Exception {
             final JacksonJsonReader<MultiFieldMixedAnnotations> jsonReader = new JacksonJsonReader<MultiFieldMixedAnnotations>(jsonFactory, jxControls, MultiFieldMixedAnnotations.class);
             
@@ -99,7 +100,7 @@ public class JacksonJsonReaderTest {
             assertEquals("", "default-string-field", materializedObject.getStringField());
         }
         
-        @Test @Ignore
+        @Test
         public void shouldSkipExtraComplexFields() throws Exception {
             final JacksonJsonReader<MultiFieldMixedAnnotations> jsonReader = new JacksonJsonReader<MultiFieldMixedAnnotations>(jsonFactory, jxControls, MultiFieldMixedAnnotations.class);
             
@@ -115,7 +116,7 @@ public class JacksonJsonReaderTest {
     
     public static class WhenReadingObjectGraphsWithCollections extends TestParent {
         
-        @Test @Ignore
+        @Test
         public void shouldMapCollections() throws Exception {
             final JacksonJsonReader<CollectionFields> jsonReader = new JacksonJsonReader<CollectionFields>(jsonFactory, jxControls, CollectionFields.class);
             

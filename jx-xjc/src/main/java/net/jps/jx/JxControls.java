@@ -12,4 +12,5 @@ public interface JxControls {
     ClassMapper getClassMapper();
 
     ObjectConstructor getObjectConstructor();
+    
 }
