@@ -1,4 +1,4 @@
-package net.jps.jx.jackson.mapping;
+package net.jps.jx.mapping;
 
 import net.jps.jx.mapping.MappedField;
 

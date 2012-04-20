@@ -1,9 +1,11 @@
 package net.jps.jx.jackson.mapping;
 
+import net.jps.jx.mapping.ClassDescriptor;
 import java.lang.reflect.Field;
 import java.util.*;
 import net.jps.jx.mapping.ClassMapper;
 import net.jps.jx.mapping.MappedField;
+import net.jps.jx.mapping.reflection.DefaultClassMapper;
 import net.jps.jx.util.reflection.JxAnnotationTool;
 import net.jps.jx.util.reflection.ReflectionException;
 import org.slf4j.Logger;
@@ -16,15 +18,32 @@ import org.slf4j.LoggerFactory;
 public class ClassCrawler {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClassCrawler.class);
+    
     private final ClassMapper fieldMapper;
-    private Class trunk;
+    private final Class trunk;
+    
+    private ClassDescriptor trunkGraph;
+
+    public ClassCrawler(Class trunk) {
+        this(DefaultClassMapper.getInstance(), trunk);
+    }
 
     public ClassCrawler(ClassMapper fieldMapper, Class trunk) {
         this.fieldMapper = fieldMapper;
         this.trunk = trunk;
+        
+        trunkGraph = null;
     }
 
     public ClassDescriptor getGraph() {
+        if (trunkGraph == null) {
+            trunkGraph = newGraph();
+        }
+        
+        return trunkGraph;
+    }
+
+    public ClassDescriptor newGraph() {
         final ClassDescriptorBuilder trunkDescriptorBuilder = new ClassDescriptorBuilder(trunk);
         final Stack<ClassDescriptorEntry> classDescriptors = new Stack<ClassDescriptorEntry>(); // three 's' characters can't be wrong!
 
@@ -36,7 +55,7 @@ public class ClassCrawler {
             if (classDescriptor.hasFieldsToInspect()) {
                 // Not done with this class
                 classDescriptors.push(classDescriptor);
-                
+
                 // Graph the field
                 graphField(classDescriptor, classDescriptors);
             } else {

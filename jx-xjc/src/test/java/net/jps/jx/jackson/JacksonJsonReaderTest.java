@@ -3,12 +3,9 @@ package net.jps.jx.jackson;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import net.jps.jx.JxControls;
-import net.jps.jx.JxControlsImpl;
+import net.jps.jx.JsonReader;
+import net.jps.jx.JxFactory;
 import net.jps.jx.JxParsingException;
-import net.jps.jx.mapping.reflection.StaticFieldMapper;
-import org.codehaus.jackson.JsonFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
@@ -16,7 +13,6 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.*;
 import static net.jps.jx.jackson.TestClasses.*;
-import net.jps.jx.mapping.DefaultObjectConstructor;
 import org.junit.Ignore;
 
 /**
@@ -29,13 +25,11 @@ public class JacksonJsonReaderTest {
     @Ignore
     public static class TestParent {
         
-        protected JsonFactory jsonFactory;
-        protected JxControls jxControls;
+        protected JxFactory factory;
         
         @Before
         public void standUp() throws DatatypeConfigurationException {
-            jsonFactory = new JsonFactory();
-            jxControls = new JxControlsImpl(new DefaultObjectConstructor(DatatypeFactory.newInstance()), StaticFieldMapper.getInstance());
+            factory = new JacksonJxFactory();
         }
     }
     
@@ -43,7 +37,7 @@ public class JacksonJsonReaderTest {
         
         @Test
         public void shouldReadStringFields() throws Exception {
-            final JacksonJsonReader<OneStringField> jsonReader = new JacksonJsonReader<OneStringField>(jsonFactory, jxControls, OneStringField.class);
+            final JsonReader<OneStringField> jsonReader = factory.newReader(OneStringField.class);
             
             final ByteArrayInputStream inputStream = new ByteArrayInputStream("{ \"stringField\": \"test\" }".getBytes());
             final OneStringField materializedObject = jsonReader.read(inputStream);
@@ -53,7 +47,7 @@ public class JacksonJsonReaderTest {
         
         @Test(expected = JxParsingException.class)
         public void shouldCatchUnexpectedCollections() throws Exception {
-            final JacksonJsonReader<OneStringField> jsonReader = new JacksonJsonReader<OneStringField>(jsonFactory, jxControls, OneStringField.class);
+            final JsonReader<OneStringField> jsonReader = factory.newReader(OneStringField.class);
             
             final ByteArrayInputStream inputStream = new ByteArrayInputStream("{ \"stringField\": [ \"test\" ]}".getBytes());
             final OneStringField materializedObject = jsonReader.read(inputStream);
@@ -63,7 +57,7 @@ public class JacksonJsonReaderTest {
         
         @Test
         public void shouldReadAnnotatedFields() throws Exception {
-            final JacksonJsonReader<MultiFieldMixedAnnotations> jsonReader = new JacksonJsonReader<MultiFieldMixedAnnotations>(jsonFactory, jxControls, MultiFieldMixedAnnotations.class);
+            final JsonReader<MultiFieldMixedAnnotations> jsonReader = factory.newReader(MultiFieldMixedAnnotations.class);
             
             final InputStream inputStream = JacksonJsonReaderTest.class.getResourceAsStream("/META-INF/json/MultiFieldMixedAnnotations.json");
             final MultiFieldMixedAnnotations materializedObject = jsonReader.read(inputStream);
@@ -76,7 +70,7 @@ public class JacksonJsonReaderTest {
         
         @Test
         public void shouldReadAnnotatedFieldsWithPartialJsonPayload() throws Exception {
-            final JacksonJsonReader<MultiFieldMixedAnnotations> jsonReader = new JacksonJsonReader<MultiFieldMixedAnnotations>(jsonFactory, jxControls, MultiFieldMixedAnnotations.class);
+            final JsonReader<MultiFieldMixedAnnotations> jsonReader = factory.newReader(MultiFieldMixedAnnotations.class);
             
             final InputStream inputStream = JacksonJsonReaderTest.class.getResourceAsStream("/META-INF/json/MultiFieldMixedAnnotations_MissingField.json");
             final MultiFieldMixedAnnotations materializedObject = jsonReader.read(inputStream);
@@ -89,7 +83,7 @@ public class JacksonJsonReaderTest {
         
         @Test
         public void shouldSkipExtraFields() throws Exception {
-            final JacksonJsonReader<MultiFieldMixedAnnotations> jsonReader = new JacksonJsonReader<MultiFieldMixedAnnotations>(jsonFactory, jxControls, MultiFieldMixedAnnotations.class);
+            final JsonReader<MultiFieldMixedAnnotations> jsonReader = factory.newReader(MultiFieldMixedAnnotations.class);
             
             final InputStream inputStream = JacksonJsonReaderTest.class.getResourceAsStream("/META-INF/json/MultiFieldMixedAnnotations_ExtraField.json");
             final MultiFieldMixedAnnotations materializedObject = jsonReader.read(inputStream);
@@ -102,7 +96,7 @@ public class JacksonJsonReaderTest {
         
         @Test
         public void shouldSkipExtraComplexFields() throws Exception {
-            final JacksonJsonReader<MultiFieldMixedAnnotations> jsonReader = new JacksonJsonReader<MultiFieldMixedAnnotations>(jsonFactory, jxControls, MultiFieldMixedAnnotations.class);
+            final JsonReader<MultiFieldMixedAnnotations> jsonReader = factory.newReader(MultiFieldMixedAnnotations.class);
             
             final InputStream inputStream = JacksonJsonReaderTest.class.getResourceAsStream("/META-INF/json/MultiFieldMixedAnnotations_ExtraFieldComplex.json");
             final MultiFieldMixedAnnotations materializedObject = jsonReader.read(inputStream);
@@ -118,7 +112,7 @@ public class JacksonJsonReaderTest {
         
         @Test
         public void shouldMapCollections() throws Exception {
-            final JacksonJsonReader<CollectionFields> jsonReader = new JacksonJsonReader<CollectionFields>(jsonFactory, jxControls, CollectionFields.class);
+            final JsonReader<CollectionFields> jsonReader = factory.newReader(CollectionFields.class);
             
             final InputStream inputStream = JacksonJsonReaderTest.class.getResourceAsStream("/META-INF/json/CollectionFields.json");
             final CollectionFields materializedObject = jsonReader.read(inputStream);

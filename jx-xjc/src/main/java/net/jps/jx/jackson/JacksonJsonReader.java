@@ -5,7 +5,7 @@ import java.io.InputStream;
 import net.jps.jx.JsonReader;
 import net.jps.jx.JxParsingException;
 import net.jps.jx.jackson.mapping.ClassCrawler;
-import net.jps.jx.jackson.mapping.ClassDescriptor;
+import net.jps.jx.mapping.ClassDescriptor;
 import net.jps.jx.JxControls;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParser;
@@ -20,7 +20,7 @@ public class JacksonJsonReader<T> implements JsonReader<T> {
     private final ClassDescriptor<T> trunkClassDescriptor;
     private final JxControls jxControls;
     
-    public JacksonJsonReader(JsonFactory jsonFactory, JxControls jxControls, Class<T> trunkClass) {
+    JacksonJsonReader(Class<T> trunkClass, JsonFactory jsonFactory, JxControls jxControls) {
         this.jsonFactory = jsonFactory;
         this.jxControls = jxControls;
         

@@ -1,7 +1,7 @@
 package net.jps.jx.jackson;
 
-import net.jps.jx.jackson.mapping.ClassDescriptor;
-import net.jps.jx.jackson.mapping.FieldDescriptor;
+import net.jps.jx.mapping.ClassDescriptor;
+import net.jps.jx.mapping.FieldDescriptor;
 import net.jps.jx.util.reflection.JxAnnotationTool;
 
 /**

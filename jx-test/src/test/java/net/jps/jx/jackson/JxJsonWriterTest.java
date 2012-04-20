@@ -7,13 +7,8 @@ import java.io.InputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.datatype.DatatypeFactory;
 import net.jps.jx.JsonWriter;
-import net.jps.jx.JxControls;
-import net.jps.jx.JxControlsImpl;
-import net.jps.jx.mapping.DefaultObjectConstructor;
-import net.jps.jx.mapping.reflection.StaticFieldMapper;
-import org.codehaus.jackson.JsonFactory;
+import net.jps.jx.JxFactory;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
@@ -38,10 +33,9 @@ public class JxJsonWriterTest {
 
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-            final JxControls jxControls = new JxControlsImpl(new DefaultObjectConstructor(DatatypeFactory.newInstance()), StaticFieldMapper.getInstance());
-            final JsonFactory jsonFactory = new JsonFactory();
-            final JsonWriter jsonWriter = new JacksonJsonWriter(jsonFactory, jxControls);
-
+            final JxFactory jxFactory = new JacksonJxFactory();
+            final JsonWriter<Limits> jsonWriter = jxFactory.newWriter(Limits.class);
+            
             try {
                 jsonWriter.write(limits, baos);
             } catch (Throwable ex) {

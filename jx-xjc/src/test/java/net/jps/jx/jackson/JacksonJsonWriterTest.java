@@ -4,12 +4,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
-import net.jps.jx.JxControls;
-import net.jps.jx.JxControlsImpl;
+import net.jps.jx.*;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
-import net.jps.jx.mapping.reflection.StaticFieldMapper;
+import net.jps.jx.mapping.reflection.DefaultClassMapper;
 import org.codehaus.jackson.JsonFactory;
 
 import static net.jps.jx.jackson.TestClasses.*;
@@ -34,7 +33,7 @@ public class JacksonJsonWriterTest {
         @Before
         public void standUp() throws DatatypeConfigurationException {
             jsonFactory = new JsonFactory();
-            jxControls = new JxControlsImpl(new DefaultObjectConstructor(DatatypeFactory.newInstance()), StaticFieldMapper.getInstance());
+            jxControls = new JxControlsImpl(new DefaultObjectConstructor(DatatypeFactory.newInstance()), DefaultClassMapper.getInstance());
         }
     }
 
@@ -48,13 +47,13 @@ public class JacksonJsonWriterTest {
             expected.setStringField("field");
             expected.setXmlDouble(2.4);
 
-            final JsonFactory jsonFactory = new JsonFactory();
-            final JacksonJsonWriter<MultiFieldMixedAnnotations> jsonWriter = new JacksonJsonWriter<MultiFieldMixedAnnotations>(jsonFactory, jxControls);
+            final JxFactory factory = new JacksonJxFactory();
+            final JsonWriter<MultiFieldMixedAnnotations> jsonWriter = factory.newWriter(MultiFieldMixedAnnotations.class);
 
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             jsonWriter.write(expected, baos);
 
-            final JacksonJsonReader<MultiFieldMixedAnnotations> jsonReader = new JacksonJsonReader<MultiFieldMixedAnnotations>(jsonFactory, jxControls, MultiFieldMixedAnnotations.class);
+            final JsonReader<MultiFieldMixedAnnotations> jsonReader = factory.newReader(MultiFieldMixedAnnotations.class);
             final MultiFieldMixedAnnotations rendered = jsonReader.read(new ByteArrayInputStream(baos.toByteArray()));
 
             assertEquals("", expected.getDefault(), rendered.getDefault());

@@ -3,7 +3,7 @@ package net.jps.jx.jackson;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import net.jps.jx.jackson.mapping.FieldDescriptor;
+import net.jps.jx.mapping.FieldDescriptor;
 import net.jps.jx.mapping.MappedCollectionField;
 import net.jps.jx.util.reflection.ReflectionException;
 

@@ -1,5 +1,8 @@
 package net.jps.jx.jackson.mapping;
 
+import net.jps.jx.mapping.impl.ClassDescriptorImpl;
+import net.jps.jx.mapping.ClassDescriptor;
+import net.jps.jx.mapping.FieldDescriptor;
 import java.util.LinkedList;
 import java.util.List;
 

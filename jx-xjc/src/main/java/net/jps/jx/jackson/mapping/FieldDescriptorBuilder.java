@@ -1,5 +1,7 @@
 package net.jps.jx.jackson.mapping;
 
+import net.jps.jx.mapping.impl.FieldDescriptorImpl;
+import net.jps.jx.mapping.FieldDescriptor;
 import net.jps.jx.mapping.MappedField;
 
 /**

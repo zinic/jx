@@ -1,5 +1,7 @@
 package net.jps.jx.jackson;
 
+import net.jps.jx.mapping.ClassDescriptor;
+import net.jps.jx.mapping.FieldDescriptor;
 import net.jps.jx.mapping.ObjectConstructor;
 import java.io.IOException;
 import java.util.Stack;
@@ -22,11 +24,13 @@ import org.slf4j.LoggerFactory;
 public class JsonGraphReader<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(JsonGraphReader.class);
+    
     private final Stack<GraphNode> readerNodeStack;
     private final Stack<CollectionFieldEntry> collectionFieldEntryStack;
     private final ClassDescriptor<T> graphTrunkClass;
     private final ObjectConstructor objectConstructor;
     private final ClassMapper classMapper;
+    
     // TODO: replace these two suckers with an immutable aggregration class
     private boolean shouldSkip;
     private int skipDepth;
@@ -224,7 +228,6 @@ public class JsonGraphReader<T> {
             final Object collectionValueInstance = objectConstructor.newInstance(mappedCollection.getCollectionValueClass());
 
             // TODO: THIS IS NOT EFFICIENT :x - cache it
-            // Crawl the new object's class graph.
             final ClassCrawler crawler = new ClassCrawler(classMapper, mappedCollection.getCollectionValueClass());
 
             // Push a new inspector for the collection value we're building

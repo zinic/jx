@@ -1,11 +1,11 @@
 package net.jps.jx.jackson;
 
-import net.jps.jx.mapping.ClassMapper;
 import java.io.IOException;
 import java.io.OutputStream;
 import net.jps.jx.JsonWriter;
 import net.jps.jx.JxControls;
 import net.jps.jx.JxWritingException;
+import net.jps.jx.jackson.mapping.ClassCrawler;
 import org.codehaus.jackson.JsonFactory;
 
 /**
@@ -14,15 +14,18 @@ import org.codehaus.jackson.JsonFactory;
  */
 public class JacksonJsonWriter<T> implements JsonWriter<T> {
 
+    private final ClassCrawler rootClassCrawler;
     private final JsonFactory jsonFactory;
     private final JxControls jxControls;
 
-    public JacksonJsonWriter(JsonFactory jsonFactory, JxControls jxControls) {
+    JacksonJsonWriter(Class<T> clazz, JsonFactory jsonFactory, JxControls jxControls) {
+        this.rootClassCrawler = new ClassCrawler(clazz);
         this.jsonFactory = jsonFactory;
         this.jxControls = jxControls;
     }
+    
     @Override
     public void write(T rootObject, OutputStream outputStream) throws IOException, JxWritingException {
-        new JsonGraphWriter(jsonFactory, jxControls.getClassMapper()).write(rootObject, outputStream);
+        new JsonGraphWriter(jsonFactory, jxControls.getClassMapper(), rootClassCrawler.getGraph()).write(rootObject, outputStream);
     }
 }

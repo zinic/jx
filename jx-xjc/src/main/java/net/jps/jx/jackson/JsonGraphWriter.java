@@ -9,8 +9,8 @@ import java.util.Iterator;
 import java.util.Stack;
 import net.jps.jx.JxWritingException;
 import net.jps.jx.jackson.mapping.ClassCrawler;
-import net.jps.jx.jackson.mapping.ClassDescriptor;
-import net.jps.jx.jackson.mapping.FieldDescriptor;
+import net.jps.jx.mapping.ClassDescriptor;
+import net.jps.jx.mapping.FieldDescriptor;
 import net.jps.jx.jackson.mapping.JacksonNumberWriter;
 import net.jps.jx.util.reflection.ReflectionException;
 import org.codehaus.jackson.JsonFactory;
@@ -24,15 +24,17 @@ public class JsonGraphWriter {
 
     private final Stack<WriterGraphNode> graphNodeStack;
     private final Stack<Iterator> iteratorStack;
+    private final ClassDescriptor rootClass;
     private final JsonFactory jsonFactory;
     private final ClassMapper classMapper;
 
-    public JsonGraphWriter(JsonFactory jsonFactory, ClassMapper classMapper) {
+    public JsonGraphWriter(JsonFactory jsonFactory, ClassMapper classMapper, ClassDescriptor rootClass) {
         graphNodeStack = new Stack<WriterGraphNode>();
         iteratorStack = new Stack<Iterator>();
 
         this.jsonFactory = jsonFactory;
         this.classMapper = classMapper;
+        this.rootClass = rootClass;
     }
 
     public void write(Object rootObject, OutputStream outputStream) throws IOException, JxWritingException {
@@ -40,9 +42,7 @@ public class JsonGraphWriter {
         final JsonNumberWriter jsonNumberWriter = new JacksonNumberWriter(jsonGenerator);
 
         // Root node
-        // TODO: THIS IS NOT EFFICIENT :x - cache it
-        final ClassCrawler rootClassCrawler = new ClassCrawler(classMapper, rootObject.getClass());
-        write(jsonGenerator, jsonNumberWriter, rootClassCrawler.getGraph(), rootObject);
+        write(jsonGenerator, jsonNumberWriter, rootClass, rootObject);
 
         try {
             while (!graphNodeStack.isEmpty()) {
@@ -78,7 +78,7 @@ public class JsonGraphWriter {
                         iteratorStack.push(collectionIterator);
 
                         final Object collectionValue = collectionIterator.next();
-                        
+
                         if (collectionValue != null) {
                             // TODO: THIS IS NOT EFFICIENT :x - cache it
                             final ClassCrawler classCrawler = new ClassCrawler(classMapper, collectionValue.getClass());
@@ -92,13 +92,7 @@ public class JsonGraphWriter {
                     }
                 }
             }
-        } catch (JxWritingException jwe) {
-//         unwindObjectGraphStack(jwe, graphNodeStack);
-
-            throw jwe;
         } catch (ReflectionException ex) {
-//         unwindObjectGraphStack(ex, graphNodeStack);
-
             throw new JxWritingException("Failed to write object graph to output stream as JSON. Reason: " + ex.getMessage(), ex);
         } finally {
             if (jsonGenerator != null) {
@@ -107,22 +101,6 @@ public class JsonGraphWriter {
         }
     }
 
-//   private void unwindObjectGraphStack(Exception ex, Stack<WriterGraphNode> graphNodeStack) {
-//      if (LOG.isDebugEnabled()) {
-//         final StringBuilder outputBuilder = new StringBuilder("Exception caught during writing. Failure reason: ");
-//         outputBuilder.append(ex.getMessage()).append("\nObject Graph Stack Dump");
-//
-//         while (!graphNodeStack.isEmpty()) {
-//            final WriterGraphNode wgn = graphNodeStack.pop();
-//
-//            outputBuilder.append("Object Graph Node: object:").append(wgn.getValueObject().toString()).append(" - class: ");
-//            outputBuilder.append(wgn.getValueObject().getClass().getName()).append(" - toString: ").append(wgn.getValueObject().toString());
-//         }
-//
-//         LOG.error(outputBuilder.toString(), ex);
-//      }
-//   }
-    
     private void write(JsonGenerator jsonGenerator, JsonNumberWriter jsonNumberWriter, ClassDescriptor classDescriptor, Object valueBeingWritten) throws IOException, JxWritingException {
         // Check the value of the next field
         final JsonTypeDescriptor jtd = classMapper.describeJsonType(valueBeingWritten.getClass());

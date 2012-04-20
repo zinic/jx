@@ -20,7 +20,7 @@ import net.jps.jx.util.reflection.ClassTools;
  *
  * @author zinic
  */
-public class StaticFieldMapper implements ClassMapper {
+public class DefaultClassMapper implements ClassMapper {
 
     private static final Class[] STRING_CLASSES = new Class[]{XMLGregorianCalendar.class, String.class, Enum.class},
             ARRAY_CLASSES = new Class[]{Iterable.class},
@@ -30,11 +30,11 @@ public class StaticFieldMapper implements ClassMapper {
             // TODO:Enhancement - This should be changed to a generated white-list. Maybe like a class graph prescan? Close :3
             DEFAULT_NON_DESCENT_CLASSES = new Class[]{Class.class, String.class, Collection.class, Enum.class, XMLGregorianCalendar.class};
     
-    private static final StaticFieldMapper MAPPER_INSTANCE;
+    private static final DefaultClassMapper MAPPER_INSTANCE;
 
     static {
         try {
-            MAPPER_INSTANCE = new StaticFieldMapper(DatatypeFactory.newInstance());
+            MAPPER_INSTANCE = new DefaultClassMapper(DatatypeFactory.newInstance());
         } catch (DatatypeConfigurationException dce) {
             throw new MissingDatatypeFactoryException("Failed to init a datatype factory. "
                     + "Please see, http://docs.oracle.com/javase/1.5.0/docs/api/javax/xml/datatype/DatatypeFactory.html for more information.", dce);
@@ -46,7 +46,7 @@ public class StaticFieldMapper implements ClassMapper {
     }
     private final DatatypeFactory datatypeFactory;
 
-    public StaticFieldMapper(DatatypeFactory datatypeFactory) {
+    public DefaultClassMapper(DatatypeFactory datatypeFactory) {
         this.datatypeFactory = datatypeFactory;
     }
 
