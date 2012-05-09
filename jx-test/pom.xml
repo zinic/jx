@@ -62,37 +62,73 @@
             
             <executions>
                <execution>
+                  <id>repose-limits-example</id>
+                  
                   <goals>
                      <goal>generate</goal>
                   </goals>
                   
-                  <phase>process-sources</phase>
+                  <configuration>
+                     <schemaDirectory>src/main/resources/META-INF/schema/limits</schemaDirectory>
+
+                     <schemasInclude>
+                        <include>*.xsd</include>
+                     </schemasInclude>
+  
+                     <bindingsInclude>
+                        <include>*.xjb</include>
+                     </bindingsInclude>
+
+                     <generateDirectory>${project.build.directory}/generated-sources/xjc/limits</generateDirectory>
+
+                     <args>
+                        <arg>-extension</arg>
+                        <arg>-Xjx</arg>
+                     </args>
+                     
+                     <plugins>
+                        <plugin>
+                           <groupId>net.jps.jx</groupId>
+                           <artifactId>jx-xjc</artifactId>
+                        </plugin>
+                     </plugins>
+                  </configuration>
+               </execution>
+
+               <execution>
+                  <id>cs-api-example</id>
+                  
+                  <goals>
+                     <goal>generate</goal>
+                  </goals>
+                  
+                  <configuration>
+                     <schemaDirectory>src/main/resources/META-INF/schema/servers</schemaDirectory>
+
+                     <schemasInclude>
+                        <include>*.xsd</include>
+                     </schemasInclude>
+  
+                     <bindingsInclude>
+                        <include>*.xjb</include>
+                     </bindingsInclude>
+
+                     <generateDirectory>${project.build.directory}/generated-sources/xjc/servers</generateDirectory>
+
+                     <args>
+                        <arg>-extension</arg>
+                        <arg>-Xjx</arg>
+                     </args>
+                     
+                     <plugins>
+                        <plugin>
+                           <groupId>net.jps.jx</groupId>
+                           <artifactId>jx-xjc</artifactId>
+                        </plugin>
+                     </plugins>
+                  </configuration>
                </execution>
             </executions>
-            
-            <configuration>
-               <schemaDirectory>src/main/resources/META-INF/schema/</schemaDirectory>
-
-               <schemasInclude>
-                  <include>*.xsd</include>
-               </schemasInclude>
-  
-               <bindingsInclude>
-                  <include>*.xjb</include>
-               </bindingsInclude>
-
-               <args>
-                  <arg>-extension</arg>
-                  <arg>-Xjx</arg>
-               </args>
-                     
-               <plugins>
-                  <plugin>
-                     <groupId>net.jps.jx</groupId>
-                     <artifactId>jx-xjc</artifactId>
-                  </plugin>
-               </plugins>
-            </configuration>
          </plugin>
       </plugins>
    </build>

@@ -8,6 +8,8 @@ import java.lang.annotation.*;
  */
 @Inherited
 @Retention(value = RetentionPolicy.RUNTIME)
-@Target(value = {ElementType.TYPE})
-public @interface JsonObjectWrap {
+@Target(value = {ElementType.FIELD})
+public @interface JsonFieldName {
+
+   String value() default "";
 }

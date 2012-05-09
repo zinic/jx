@@ -4,8 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import net.jps.jx.annotation.JsonField;
-import net.jps.jx.annotation.JsonObjectWrap;
+import net.jps.jx.annotation.JsonFieldName;
 
 /**
  *
@@ -13,7 +12,6 @@ import net.jps.jx.annotation.JsonObjectWrap;
  */
 public class TestClasses {
 
-   @JsonObjectWrap
    public static class OneStringField {
 
       private String stringField;
@@ -30,13 +28,12 @@ public class TestClasses {
       }
    }
 
-   @JsonObjectWrap
    public static class MultiFieldMixedAnnotations {
 
-      @JsonField("doubleVal")
+      @JsonFieldName("doubleVal")
       @XmlElement(name = "doubleValue")
       private double xmlDouble;
-      @JsonField("number")
+      @JsonFieldName("number")
       private Integer jsonNumber;
       @XmlAttribute(name = "not-default")
       private String _default;
@@ -78,7 +75,6 @@ public class TestClasses {
       }
    }
 
-   @JsonObjectWrap
    public static class CollectionFields {
 
       private List<OneStringField> stringFields;

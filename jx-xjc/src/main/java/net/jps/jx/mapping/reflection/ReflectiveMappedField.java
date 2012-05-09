@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import net.jps.jx.annotation.JsonField;
+import net.jps.jx.annotation.JsonFieldName;
 import net.jps.jx.mapping.MappedField;
 import net.jps.jx.jaxb.JaxbConstants;
 import net.jps.jx.mapping.method.AccessorMethod;
@@ -21,7 +21,7 @@ public class ReflectiveMappedField implements MappedField {
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
     private final XmlAttribute xmlAttributeAnnotation;
     private final XmlElement xmlElementAnnotation;
-    private final JsonField jsonFieldAnnotation;
+    private final JsonFieldName jsonFieldAnnotation;
     private final Field fieldRef;
     private final Method getterRef, setterRef;
 
@@ -30,7 +30,7 @@ public class ReflectiveMappedField implements MappedField {
 
         xmlElementAnnotation = (XmlElement) fieldRef.getAnnotation(XmlElement.class);
         xmlAttributeAnnotation = (XmlAttribute) fieldRef.getAnnotation(XmlAttribute.class);
-        jsonFieldAnnotation = (JsonField) fieldRef.getAnnotation(JsonField.class);
+        jsonFieldAnnotation = (JsonFieldName) fieldRef.getAnnotation(JsonFieldName.class);
 
         getterRef = findGetter();
         setterRef = findSetter();

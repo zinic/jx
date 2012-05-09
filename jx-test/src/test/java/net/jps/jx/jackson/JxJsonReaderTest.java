@@ -1,7 +1,5 @@
 package net.jps.jx.jackson;
 
-import com.rackspace.papi.components.limits.schema.Limits;
-import com.rackspace.papi.components.limits.schema.ObjectFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -9,6 +7,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import net.jps.jx.*;
+import net.jps.jx.test.papi.components.limits.schema.Limits;
+import net.jps.jx.test.papi.components.limits.schema.ObjectFactory;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
@@ -24,7 +24,7 @@ public class JxJsonReaderTest {
 
         @Test
         public void should() throws Exception {
-            final InputStream inputStream = JxJsonReaderTest.class.getResourceAsStream("/META-INF/xml/limits.xml");
+            final InputStream inputStream = JxJsonReaderTest.class.getResourceAsStream("/META-INF/schema/limits/example.xml");
 
             final JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
             final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();

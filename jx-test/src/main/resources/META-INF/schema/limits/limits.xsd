@@ -70,10 +70,6 @@
                A Limits type defines a collection of limits
             </html:p>
          </xs:documentation>
-         
-         <xs:appinfo>
-            <jx:wrap />
-         </xs:appinfo>
       </xs:annotation>
         
       <xs:sequence>
@@ -132,7 +128,7 @@
          <xs:element name="limit" type="limits:RateLimit" minOccurs="1" maxOccurs="unbounded">
             <xs:annotation>
                <xs:appinfo>
-                  <jx:map as="ivgnaeoijgioaejgioaejgioaejgeioaj" />
+                  <jx:bind strategy="rename" as="thisisaninsanefieldnamebutitsfortesting" />
                </xs:appinfo>
             </xs:annotation>
          </xs:element>
@@ -255,7 +251,7 @@
             </xs:documentation>
             
             <xs:appinfo>
-               <jx:map as="limit" />
+               <jx:bind strategy="rename" as="limit" />
             </xs:appinfo>
          </xs:annotation>
       </xs:attribute>
@@ -282,7 +278,7 @@
             </xs:documentation>
             
             <xs:appinfo>
-               <jx:map as="timeUnit" />
+               <jx:bind strategy="rename" as="timeUnit" />
             </xs:appinfo>
          </xs:annotation>
       </xs:attribute>

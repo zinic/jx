@@ -1,7 +1,5 @@
 package net.jps.jx.xjc;
 
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JFieldVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.model.*;
@@ -10,41 +8,46 @@ import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
 import java.util.Collections;
 import java.util.List;
-import net.jps.jx.annotation.JsonField;
-import net.jps.jx.annotation.JsonObjectWrap;
+import net.jps.jx.Jx;
+import net.jps.jx.xjc.strategy.BindingAnnotation;
+import net.jps.jx.xjc.strategy.BindingStrategy;
+import net.jps.jx.xjc.strategy.XjcBindingAnnotation;
+import net.jps.jx.xjc.strategy.rename.RenameStrategy;
+import net.jps.jx.xjc.strategy.result.BindingResult;
+import net.jps.jx.xjc.strategy.result.JxBindingResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 
 /**
- * 
+ *
  * @author zinic
  */
 public class JxPlugin extends Plugin {
 
    private static final Logger LOG = LoggerFactory.getLogger(JxPlugin.class);
-   
-   private final String jxNamespace;
+   private final BindingStrategy[] bindingStrategies;
+   private final String namespace;
 
    public JxPlugin() {
-      this("http://jpserver.net/jx");
+      this(Jx.XML_NAMESPACE);
    }
 
    public JxPlugin(String jxNamespace) {
-      this.jxNamespace = jxNamespace;
+      this.namespace = jxNamespace;
+
+      bindingStrategies = new BindingStrategy[]{new RenameStrategy()};
    }
 
    @Override
    public List<String> getCustomizationURIs() {
-      return Collections.singletonList(jxNamespace);
+      return Collections.singletonList(namespace);
    }
 
    @Override
    public boolean isCustomizationTagName(String nsUri, String localName) {
-//      LOG.info("isCustomizationTagName for \"" + nsUri + ":" + localName + "\" - " + (jxNamespace.equals(nsUri) && JxLocalName.isLocalName(localName)));
-
-      return jxNamespace.equals(nsUri) && JxLocalName.isLocalName(localName);
+      return namespace.equals(nsUri) && JxLocalName.isLocalName(localName);
    }
 
    @Override
@@ -59,15 +62,9 @@ public class JxPlugin extends Plugin {
 
    @Override
    public boolean run(Outline otln, Options optns, ErrorHandler eh) throws SAXException {
-//      final JClass collectionClass = otln.getCodeModel().ref(Collection.class);
-
       for (ClassOutline classOutline : otln.getClasses()) {
-         final CClassInfo target = classOutline.target;
-         final CCustomizations classCustomizations = target.getCustomizations();
 
-         // Check for class level customizations first
-         readClassAnnotations(classOutline, classCustomizations);
-
+         // Currently only support field level annotations
          for (FieldOutline fieldOutline : classOutline.getDeclaredFields()) {
             readFieldAnnotations(classOutline, fieldOutline);
          }
@@ -76,54 +73,35 @@ public class JxPlugin extends Plugin {
       return true;
    }
 
-   public void readClassAnnotations(ClassOutline classOutline, CCustomizations classCustomizations) {
-      readWrappedAnnotation(classOutline, classCustomizations);
-   }
-
    public void readFieldAnnotations(ClassOutline classOutline, FieldOutline fieldOutline) {
-      readMapAnnotation(classOutline, fieldOutline);
-   }
+      final CPluginCustomization bindingCustomization = fieldOutline.getPropertyInfo().getCustomizations().find(namespace, JxLocalName.BINDING_STRATEGY.toString());
 
-   public void readMapAnnotation(ClassOutline classOutline, FieldOutline fieldOutline) {
-      final CPluginCustomization mapAnnotation = fieldOutline.getPropertyInfo().getCustomizations().find(jxNamespace, JxLocalName.ATTRIBUTE_MAP.toString());
+      if (bindingCustomization != null && fieldOutline.getPropertyInfo() instanceof CPropertyInfo) {
+         final BindingResult result = handleBindingAnnotation(bindingCustomization, classOutline, fieldOutline);
 
-      if (mapAnnotation != null && fieldOutline.getPropertyInfo() instanceof CPropertyInfo) {
-         final CPropertyInfo attributePropertyInfo = (CPropertyInfo) fieldOutline.getPropertyInfo();
-
-         LOG.info("Found attribute map annotation. Class field \"" + attributePropertyInfo.getName(false) + "\" should be annotated as \"" + mapAnnotation.element.getAttribute("as") + "\"");
-
-         final JDefinedClass jclass = classOutline.implClass;
-         final JFieldVar o = jclass.fields().get(fieldOutline.getPropertyInfo().getName(false));
-         o.annotate(jclass.owner().ref(JsonField.class)).param("value", mapAnnotation.element.getAttribute("as"));
-
-         mapAnnotation.markAsAcknowledged();
+         if (result.successful()) {
+            bindingCustomization.markAsAcknowledged();
+         } else {
+            LOG.error("Failure in binding: " + result.message());
+            LOG.error("This will be ignored for now.");
+            bindingCustomization.markAsAcknowledged();
+         }
       }
    }
 
-   public void readValueMapAnnotation(ClassOutline classOutline, CCustomizations classCustomizations) {
-      final CPluginCustomization wrapCustomization = classCustomizations.find(jxNamespace, JxLocalName.ELEMENT_VALUE_MAP.toString());
+   public BindingResult handleBindingAnnotation(CPluginCustomization bindingCustomization, ClassOutline classOutline, FieldOutline fieldOutline) {
+      final BindingAnnotation bindingAnnotation = new XjcBindingAnnotation(bindingCustomization);
+      final String strategyName = bindingAnnotation.strategyName();
 
-      if (wrapCustomization != null) {
-         LOG.info("Found value map annotation.");
+      if (bindingAnnotation.strategyName() != null) {
+         for (BindingStrategy bindingStrategy : bindingStrategies) {
+            if (bindingStrategy.name().equals(strategyName)) {
+               return bindingStrategy.bind(bindingAnnotation, classOutline, fieldOutline);
 
-         handleWrappedType(classOutline);
-         wrapCustomization.markAsAcknowledged();
+            }
+         }
       }
-   }
 
-   public void readWrappedAnnotation(ClassOutline classOutline, CCustomizations classCustomizations) {
-      final CPluginCustomization wrapCustomization = classCustomizations.find(jxNamespace, JxLocalName.OBJECT_WRAP.toString());
-
-      if (wrapCustomization != null) {
-         LOG.info("Found wrap annotation. This class should be annotated.");
-
-         handleWrappedType(classOutline);
-         wrapCustomization.markAsAcknowledged();
-      }
-   }
-
-   public void handleWrappedType(ClassOutline classOutline) {
-      final JDefinedClass jclass = classOutline.implClass;
-      jclass.annotate(jclass.owner().ref(JsonObjectWrap.class));
+      return JxBindingResult.failure("No binding strategy registered that matches \"" + strategyName + "\"");
    }
 }

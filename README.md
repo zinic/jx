@@ -23,11 +23,17 @@ Jx makes it trivial to support XML and JSON with ONE schema contract (the XSD). 
 
 * Mapping framework that understands JAXB annotations
 
+* Extensible binding strategy framework
+
+###Jx XJC XSD Annotation Framework###
+
+TODO
+
 ###Jx XSD Annotations###
 
-* ```<jx:map as="[json-field-name]" />```
+* ```<jx:bind strategy="[jx-strategy-name]" />```
 
-    Binds a JSON field name annotation to the XSD type or Element, allowing a user the ability to arbitrarily bind XSD names to JSON fields.
+    Binds a JSON binding annotation to the XSD type or Element. The strategy selects the desired behavior from registered binding strategies. Any number of attributes may follow the strategy attribute and be treated as strategy arguments.
 
 
 ##The Project Structure##
