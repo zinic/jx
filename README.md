@@ -61,7 +61,7 @@ XJC plugin.
 
 ###The XML###
 
-[A Jx annotated example schema](https://github.com/zinic/jx/blob/master/jx-test/src/main/resources/META-INF/schema/limits.xsd)
+[A Jx annotated example schema taken from the Repose project](https://github.com/zinic/jx/blob/master/jx-test/src/main/resources/META-INF/schema/limits/limits.xsd)
 
 ###The Javas###
 
