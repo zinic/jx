@@ -12,4 +12,12 @@ public enum JsonType {
    NUMBER,
    OBJECT,
    NULL;
+
+   public static boolean isCollection(JsonTypeDescriptor typeDescriptor) {
+      return isCollection(typeDescriptor.getJsonType());
+   }
+
+   public static boolean isCollection(JsonType type) {
+      return type == ARRAY;
+   }
 }

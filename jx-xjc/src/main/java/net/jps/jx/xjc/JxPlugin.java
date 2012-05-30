@@ -12,6 +12,7 @@ import net.jps.jx.Jx;
 import net.jps.jx.xjc.strategy.BindingAnnotation;
 import net.jps.jx.xjc.strategy.BindingStrategy;
 import net.jps.jx.xjc.strategy.XjcBindingAnnotation;
+import net.jps.jx.xjc.strategy.fieldmapping.MapAsFieldStrategy;
 import net.jps.jx.xjc.strategy.rename.RenameStrategy;
 import net.jps.jx.xjc.strategy.result.BindingResult;
 import net.jps.jx.xjc.strategy.result.JxBindingResult;
@@ -37,7 +38,7 @@ public class JxPlugin extends Plugin {
    public JxPlugin(String jxNamespace) {
       this.namespace = jxNamespace;
 
-      bindingStrategies = new BindingStrategy[]{new RenameStrategy()};
+      bindingStrategies = new BindingStrategy[]{new RenameStrategy(), new MapAsFieldStrategy()};
    }
 
    @Override

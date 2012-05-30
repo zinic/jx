@@ -1,8 +1,9 @@
 package net.jps.jx.jackson;
 
+import java.util.HashMap;
+import java.util.Map;
 import net.jps.jx.mapping.ClassDescriptor;
 import net.jps.jx.mapping.FieldDescriptor;
-import net.jps.jx.util.reflection.JxAnnotationTool;
 
 /**
  *
@@ -10,45 +11,56 @@ import net.jps.jx.util.reflection.JxAnnotationTool;
  */
 public class GraphNode {
 
-    private final ClassDescriptor typeDescriptor;
-    private final FieldDescriptor fieldDescriptor;
-    private final Object instance;
+   private final Map<Object, Object> nodeAttributes;
+   private final ClassDescriptor typeDescriptor;
+   private final FieldDescriptor fieldDescriptor;
+   private final Object instance;
 
-    public GraphNode(Object instance, FieldDescriptor fieldDescriptor) {
-        this(instance, fieldDescriptor.getTypeDescriptor(), fieldDescriptor);
-    }
-    
-    public GraphNode(Object instance, ClassDescriptor classDescriptor) {
-        this(instance, classDescriptor, null);
-    }
-    
-    private GraphNode(Object instance, ClassDescriptor classDescriptor, FieldDescriptor fieldDescriptor) {
-        this.typeDescriptor = classDescriptor;
-        this.fieldDescriptor = fieldDescriptor;
-        this.instance = instance;
-    }
+   public GraphNode(Object instance, FieldDescriptor fieldDescriptor) {
+      this(instance, fieldDescriptor.getTypeDescriptor(), fieldDescriptor);
+   }
 
-    public Object get(FieldDescriptor instanceField) {
-        return instanceField.getMappedField().getAccessorFor(instance).get();
-    }
+   public GraphNode(Object instance, ClassDescriptor classDescriptor) {
+      this(instance, classDescriptor, null);
+   }
 
-    public void set(FieldDescriptor instanceField, Object value) {
-        instanceField.getMappedField().getSetterFor(instance).set(value);
-    }
+   private GraphNode(Object instance, ClassDescriptor classDescriptor, FieldDescriptor fieldDescriptor) {
+      this.typeDescriptor = classDescriptor;
+      this.fieldDescriptor = fieldDescriptor;
+      this.instance = instance;
+      
+      nodeAttributes = new HashMap<Object, Object>();
+   }
 
-    public Object getInstance() {
-        return instance;
-    }
+   public void putAttribute(Object key, Object value) {
+      nodeAttributes.put(key, value);
+   }
+   
+   public Object getAttribute(Object key) {
+      return nodeAttributes.get(key);
+   }
+   
+   public Object get(FieldDescriptor instanceField) {
+      return instanceField.getMappedField().getAccessorFor(instance).get();
+   }
 
-    public ClassDescriptor getClassDescriptor() {
-        return typeDescriptor;
-    }
+   public void set(FieldDescriptor instanceField, Object value) {
+      instanceField.getMappedField().getSetterFor(instance).set(value);
+   }
 
-    public boolean isField() {
-        return fieldDescriptor != null;
-    }
+   public Object getInstance() {
+      return instance;
+   }
 
-    public FieldDescriptor getFieldDescriptor() {
-        return fieldDescriptor;
-    }
+   public ClassDescriptor getClassDescriptor() {
+      return typeDescriptor;
+   }
+
+   public boolean isField() {
+      return fieldDescriptor != null;
+   }
+
+   public FieldDescriptor getFieldDescriptor() {
+      return fieldDescriptor;
+   }
 }

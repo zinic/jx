@@ -55,7 +55,7 @@ public class ReflectiveMappedField implements MappedField {
     @Override
     public SetterMethod getSetterFor(final Object setterTarget) {
         if (!hasSetter()) {
-            throw new UnsupportedOperationException("Setter method not supported.");
+            throw new UnsupportedOperationException("Setter method not supported for field: " + fieldRef.getName() +" of class: " + fieldRef.getDeclaringClass().getCanonicalName());
         }
 
         return new SetterMethod() {

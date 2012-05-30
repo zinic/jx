@@ -416,7 +416,7 @@
                </xsd:documentation>
                
                <xsd:appinfo>
-                  <jx:bind strategy="map-as-field" field-name="key" use-element-value="true" />
+                  <jx:bind strategy="map-as-field" field-name="key" />
                </xsd:appinfo>
             </annotation>
          </element>

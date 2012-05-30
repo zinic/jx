@@ -19,7 +19,7 @@ public class ClassCrawler {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClassCrawler.class);
     
-    private final ClassMapper fieldMapper;
+    private final ClassMapper classMapper;
     private final Class trunk;
     
     private ClassDescriptor trunkGraph;
@@ -28,8 +28,8 @@ public class ClassCrawler {
         this(DefaultClassMapper.getInstance(), trunk);
     }
 
-    public ClassCrawler(ClassMapper fieldMapper, Class trunk) {
-        this.fieldMapper = fieldMapper;
+    public ClassCrawler(ClassMapper classMapper, Class trunk) {
+        this.classMapper = classMapper;
         this.trunk = trunk;
         
         trunkGraph = null;
@@ -45,7 +45,7 @@ public class ClassCrawler {
 
     public ClassDescriptor newGraph() {
         final ClassDescriptorBuilder trunkDescriptorBuilder = new ClassDescriptorBuilder(trunk);
-        final Stack<ClassDescriptorEntry> classDescriptors = new Stack<ClassDescriptorEntry>(); // three 's' characters can't be wrong!
+        final Stack<ClassDescriptorEntry> classDescriptors = new Stack<ClassDescriptorEntry>();
 
         classDescriptors.push(new ClassDescriptorEntry(trunkDescriptorBuilder, getFields(trunkDescriptorBuilder)));
 
@@ -80,7 +80,7 @@ public class ClassCrawler {
         final FieldDescriptorBuilder nextField = classDescriptor.nextField();
         final Class nextFieldType = nextField.getMappedFied().getField().getType();
 
-        if (fieldMapper.shouldDescend(nextFieldType)) {
+        if (classMapper.shouldDescend(nextFieldType)) {
             final ClassDescriptorBuilder fieldTypeCDBuilder = new ClassDescriptorBuilder(nextFieldType);
 
             classDescriptors.push(new ClassDescriptorEntry(nextField.getTypeDescriptorBuilder(), getFields(fieldTypeCDBuilder)));
@@ -90,7 +90,7 @@ public class ClassCrawler {
     private List<FieldDescriptorBuilder> getFields(ClassDescriptorBuilder classDescriptorBuilder) {
         final Class classWithFields = classDescriptorBuilder.getDescribedClass();
 
-        if (fieldMapper.shouldDescend(classWithFields)) {
+        if (classMapper.shouldDescend(classWithFields)) {
             return filterFields(classWithFields);
         }
 
@@ -111,7 +111,7 @@ public class ClassCrawler {
 
     private FieldDescriptorBuilder mapField(Field classField) {
         try {
-            final MappedField mappedField = fieldMapper.mapField(classField);
+            final MappedField mappedField = classMapper.mapField(classField);
             return new FieldDescriptorBuilder(new ClassDescriptorBuilder(classField.getType()), mappedField);
         } catch (ReflectionException re) {
             LOG.warn("Unable to map field " + classField.getDeclaringClass().getCanonicalName() + "::" + classField.getName() + ". Reason: " + re.getMessage());
